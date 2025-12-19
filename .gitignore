@@ -27,3 +27,8 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+python_sdk/
+
+# Refactoring plan (internal documentation)
+REFACTORING_PLAN.md
