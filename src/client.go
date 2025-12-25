@@ -11,10 +11,10 @@ import (
 )
 
 // Client provides REST API functionality for perpetual trading.
-// It embeds BaseModule to reuse common functionality like HTTP client, auth, etc.
+// It embeds BaseClient to reuse common functionality like HTTP client, auth, etc.
 // It provides access to domain-specific services through the Account, Orders, and Markets fields.
 type Client struct {
-	*client.BaseModule
+	*client.BaseClient
 	Account *account.Service
 	Orders  *orders.Service
 	Markets *markets.Service
@@ -27,22 +27,22 @@ func NewClient(
 	starkAccount *client.StarkPerpetualAccount,
 	clientTimeout time.Duration,
 ) *Client {
-	baseModule := client.NewBaseModule(cfg, starkAccount.APIKey(), starkAccount, nil, clientTimeout)
+	baseClient := client.NewBaseClient(cfg, starkAccount.APIKey(), starkAccount, nil, clientTimeout)
 	sdkClient := &Client{
-		BaseModule: baseModule,
+		BaseClient: baseClient,
 	}
 
-	// Initialize services with reference to BaseModule
-	sdkClient.Account = &account.Service{Base: baseModule}
-	sdkClient.Orders = &orders.Service{Base: baseModule}
-	sdkClient.Markets = &markets.Service{Base: baseModule}
+	// Initialize services with reference to BaseClient
+	sdkClient.Account = &account.Service{Base: baseClient}
+	sdkClient.Orders = &orders.Service{Base: baseClient}
+	sdkClient.Markets = &markets.Service{Base: baseClient}
 
 	return sdkClient
 }
 
 // Close closes the HTTP client and cleans up resources.
-// It delegates to BaseModule's Close method.
+// It delegates to BaseClient's Close method.
 func (c *Client) Close() {
-	c.BaseModule.Close()
+	c.BaseClient.Close()
 }
 

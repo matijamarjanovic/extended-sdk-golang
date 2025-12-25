@@ -10,7 +10,7 @@ import (
 
 // Service provides account-related API operations.
 type Service struct {
-	Base *client.BaseModule
+	Base *client.BaseClient
 }
 
 // GetMarketFee retrieves current trading fees for a specific market

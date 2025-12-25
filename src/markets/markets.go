@@ -10,7 +10,7 @@ import (
 
 // Service provides market-related API operations.
 type Service struct {
-	Base *client.BaseModule
+	Base *client.BaseClient
 }
 
 // GetMarkets retrieves all available markets from the API

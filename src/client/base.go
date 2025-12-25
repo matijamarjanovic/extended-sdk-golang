@@ -18,8 +18,8 @@ var (
 	ErrStarkAccountNotSet = errors.New("stark account is not set")
 )
 
-// BaseModule provides common functionality for API modules.
-type BaseModule struct {
+// BaseClient provides common functionality for API clients.
+type BaseClient struct {
 	endpointConfig models.EndpointConfig
 	apiKey         string
 	starkAccount   *StarkPerpetualAccount
@@ -27,16 +27,16 @@ type BaseModule struct {
 	clientTimeout  time.Duration
 }
 
-// NewBaseModule constructs a BaseModule with all fields explicitly provided.
+// NewBaseClient constructs a BaseClient with all fields explicitly provided.
 // Pass nil for httpClient to allow lazy creation. Pass nil for starkAccount if intentionally absent.
-func NewBaseModule(
+func NewBaseClient(
 	cfg models.EndpointConfig,
 	apiKey string,
 	starkAccount *StarkPerpetualAccount,
 	httpClient *http.Client,
 	clientTimeout time.Duration,
-) *BaseModule {
-	return &BaseModule{
+) *BaseClient {
+	return &BaseClient{
 		endpointConfig: cfg,
 		apiKey:         apiKey,
 		starkAccount:   starkAccount,
@@ -45,25 +45,25 @@ func NewBaseModule(
 	}
 }
 
-func (m *BaseModule) EndpointConfig() models.EndpointConfig {
+func (m *BaseClient) EndpointConfig() models.EndpointConfig {
 	return m.endpointConfig
 }
 
-func (m *BaseModule) APIKey() (string, error) {
+func (m *BaseClient) APIKey() (string, error) {
 	if m.apiKey == "" {
 		return "", ErrAPIKeyNotSet
 	}
 	return m.apiKey, nil
 }
 
-func (m *BaseModule) StarkAccount() (*StarkPerpetualAccount, error) {
+func (m *BaseClient) StarkAccount() (*StarkPerpetualAccount, error) {
 	if m.starkAccount == nil {
 		return nil, ErrStarkAccountNotSet
 	}
 	return m.starkAccount, nil
 }
 
-func (m *BaseModule) HTTPClient() *http.Client {
+func (m *BaseClient) HTTPClient() *http.Client {
 	if m.httpClient == nil {
 		m.httpClient = &http.Client{
 			Timeout: m.clientTimeout,
@@ -73,7 +73,7 @@ func (m *BaseModule) HTTPClient() *http.Client {
 }
 
 // Close analogous to closing aiohttp session.
-func (m *BaseModule) Close() {
+func (m *BaseClient) Close() {
 	if m.httpClient != nil {
 		m.httpClient.CloseIdleConnections()
 		m.httpClient = nil
@@ -81,7 +81,7 @@ func (m *BaseModule) Close() {
 }
 
 // GetURL builds a full URL with optional query params.
-func (m *BaseModule) GetURL(path string, query map[string]string) (string, error) {
+func (m *BaseClient) GetURL(path string, query map[string]string) (string, error) {
 	full := m.endpointConfig.APIBaseURL + path
 	u, err := url.Parse(full)
 	if err != nil {
@@ -99,7 +99,7 @@ func (m *BaseModule) GetURL(path string, query map[string]string) (string, error
 
 // DoRequest performs an HTTP request and unmarshals the JSON response into the provided object
 // This function deduplicates common HTTP request logic across the SDK
-func (m *BaseModule) DoRequest(ctx context.Context, method, url string, body io.Reader, result interface{}) error {
+func (m *BaseClient) DoRequest(ctx context.Context, method, url string, body io.Reader, result interface{}) error {
 	// Create HTTP request
 	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {

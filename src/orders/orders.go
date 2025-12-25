@@ -12,7 +12,7 @@ import (
 
 // Service provides order-related API operations.
 type Service struct {
-	Base *client.BaseModule
+	Base *client.BaseClient
 }
 
 // SubmitOrder submits a perpetual order to the trading API
