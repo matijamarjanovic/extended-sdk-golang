@@ -80,18 +80,18 @@ const (
 )
 
 type CandleModel struct {
-	Open      decimal.Decimal `json:"open"`
-	Low       decimal.Decimal `json:"low"`
-	High      decimal.Decimal `json:"high"`
-	Close     decimal.Decimal `json:"close"`
-	Volume    *decimal.Decimal `json:"volume,omitempty"`
-	Timestamp int64           `json:"timestamp"`
+	Open      decimal.Decimal  `json:"o"`
+	Low       decimal.Decimal  `json:"l"`
+	High      decimal.Decimal  `json:"h"`
+	Close     decimal.Decimal  `json:"c"`
+	Volume    *decimal.Decimal `json:"v,omitempty"`
+	Timestamp int64            `json:"T"`
 }
 
 type FundingRateModel struct {
-	Market       string          `json:"market"`
-	FundingRate  decimal.Decimal `json:"fundingRate"`
-	Timestamp    int64           `json:"timestamp"`
+	Market       string          `json:"m"`
+	FundingRate  decimal.Decimal `json:"f"`
+	Timestamp    int64           `json:"T"`
 }
 
 type PublicTradeModel struct {
@@ -102,5 +102,16 @@ type PublicTradeModel struct {
 	Timestamp int64           `json:"timestamp"`
 	Price     decimal.Decimal `json:"price"`
 	Qty       decimal.Decimal `json:"qty"`
+}
+
+type OrderbookQuantityModel struct {
+	Qty   decimal.Decimal `json:"q"`
+	Price decimal.Decimal `json:"p"`
+}
+
+type OrderbookUpdateModel struct {
+	Market string                  `json:"m"`
+	Bid    []OrderbookQuantityModel `json:"b"`
+	Ask    []OrderbookQuantityModel `json:"a"`
 }
 

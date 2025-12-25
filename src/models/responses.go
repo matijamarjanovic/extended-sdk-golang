@@ -32,6 +32,7 @@ type QuoteResponse = APIResponse[Quote]
 type MarketStatsResponse = APIResponse[MarketStatsModel]
 type CandlesResponse = APIResponse[[]CandleModel]
 type FundingRatesResponse = APIResponse[[]FundingRateModel]
+type OrderbookResponse = APIResponse[OrderbookUpdateModel]
 
 // EmptyResponse represents an empty API response (for operations that don't return data)
 type EmptyResponse struct {
