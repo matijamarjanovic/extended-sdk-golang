@@ -106,14 +106,12 @@ func (m *BaseModule) DoRequest(ctx context.Context, method, url string, body io.
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	// Only set Content-Type if we have a request body
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-
-	// Add API key authentication if available
-	if apiKey, err := m.APIKey(); err == nil {
-		req.Header.Set("X-API-Key", apiKey)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "ExtendedSDKGolang/0.1.0")
+	req.Header.Set("Content-Type", "application/json")
+	
+	if m.apiKey != "" {
+		req.Header.Set("X-Api-Key", m.apiKey)
 	}
 
 	// Execute request

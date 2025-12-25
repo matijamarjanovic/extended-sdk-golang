@@ -2,7 +2,6 @@ package models
 
 import "github.com/shopspring/decimal"
 
-// The account balance
 type BalanceModel struct {
 	CollateralName           string          `json:"collateralName"`
 	Balance                  decimal.Decimal `json:"balance"`
@@ -100,7 +99,6 @@ type ClientModel struct {
 	ReferralLinkCode      *string `json:"referralLinkCode,omitempty"`
 }
 
-// Leverage for a specific market
 type AccountLeverage struct {
 	Market   string          `json:"market"`
 	Leverage  decimal.Decimal `json:"leverage"`

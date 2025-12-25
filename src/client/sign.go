@@ -1,8 +1,8 @@
 package client
 
 /*
-#cgo LDFLAGS: -L${SRCDIR}/../../../ -lorderffi
-#cgo LDFLAGS: -Wl,-rpath,${SRCDIR}/../../../
+#cgo LDFLAGS: -L${SRCDIR}/../../ -lorderffi
+#cgo LDFLAGS: -Wl,-rpath,${SRCDIR}/../../
 #include <stdlib.h>
 
 char* get_order_hash_ffi(

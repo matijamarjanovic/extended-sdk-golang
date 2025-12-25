@@ -33,22 +33,19 @@ func load() {
 	}
 }
 func createTestClient() *Client {
-	cfg := EndpointConfig{
-		APIBaseURL: "https://api.starknet.sepolia.extended.exchange/api/v1",
-	}
-
 	apiKey := os.Getenv("TEST_API_KEY")
 	vaultStr := os.Getenv("TEST_VAULT")
 	vault, _ := strconv.ParseUint(vaultStr, 10, 64)
 	publicKey := os.Getenv("TEST_PUBLIC_KEY")
 	privateKey := os.Getenv("TEST_PRIVATE_KEY")
+
 	account, err := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
 
 	if err != nil {
 		panic("Failed to create StarkPerpetualAccount: " + err.Error())
 	}
 
-	return NewClient(cfg, account, 30*time.Second)
+	return NewClient(STARKNET_TESTNET_CONFIG, account, 30*time.Second)
 }
 
 func TestClient_GetMarkets_SingleValidMarket(t *testing.T) {
@@ -99,9 +96,8 @@ func TestClient_GetMarkets_ContextTimeout(t *testing.T) {
 
 func TestClient_GetMarkets_NetworkError(t *testing.T) {
 	// Create client with invalid URL
-	cfg := EndpointConfig{
-		APIBaseURL: "http://invalid-url-that-does-not-exist.com",
-	}
+	cfg := STARKNET_TESTNET_CONFIG
+	cfg.APIBaseURL = "http://invalid-url-that-does-not-exist.com"
 	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
 	client := NewClient(cfg, account, 5*time.Second)
 	ctx := context.Background()
@@ -153,9 +149,8 @@ func TestClient_GetMarketFee_ContextTimeout(t *testing.T) {
 
 func TestClient_GetMarketFee_NetworkError(t *testing.T) {
 	// Create client with invalid URL
-	cfg := EndpointConfig{
-		APIBaseURL: "http://invalid-url-that-does-not-exist.com",
-	}
+	cfg := STARKNET_TESTNET_CONFIG
+	cfg.APIBaseURL = "http://invalid-url-that-does-not-exist.com"
 	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
 	client := NewClient(cfg, account, 5*time.Second)
 	ctx := context.Background()
@@ -185,6 +180,9 @@ func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 	nonce := int(time.Now().Unix()) // Use timestamp as nonce for uniqueness
 	expireTime := time.Now().Add(1 * time.Hour)
 
+	// Get config from client to use its StarknetDomain
+	cfg := client.EndpointConfig()
+
 	params := orders.CreateOrderObjectParams{
 		Market:          market,
 		Account:         account,
@@ -192,12 +190,7 @@ func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 		Price:           decimal.NewFromFloat(1),     // Place a low price so that it doesn't match
 		Side:            OrderSideBuy,
 		Signer:          account.Sign,
-		StarknetDomain: StarknetDomain{
-			Name:     "Perpetuals",
-			Version:  "v0",
-			ChainID:  "SN_SEPOLIA",
-			Revision: "1",
-		},
+		StarknetDomain:  cfg.StarknetDomain,
 		ExpireTime:               &expireTime,
 		PostOnly:                 false,
 		TimeInForce:              TimeInForceGTT,

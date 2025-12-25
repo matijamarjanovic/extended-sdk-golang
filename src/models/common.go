@@ -4,7 +4,17 @@ import "github.com/shopspring/decimal"
 
 // EndpointConfig represents the API endpoint configuration
 type EndpointConfig struct {
-	APIBaseURL string `json:"apiBaseURL"`
+	ChainRPCURL                string        `json:"chainRpcUrl"`
+	APIBaseURL                 string        `json:"apiBaseUrl"`
+	StreamURL                  string        `json:"streamUrl"`
+	OnboardingURL              string        `json:"onboardingUrl"`
+	SigningDomain              string        `json:"signingDomain"`
+	CollateralAssetContract    string        `json:"collateralAssetContract"`
+	AssetOperationsContract    string        `json:"assetOperationsContract"`
+	CollateralAssetOnChainID   string        `json:"collateralAssetOnChainId"`
+	CollateralDecimals         int           `json:"collateralDecimals"`
+	StarknetDomain             StarknetDomain `json:"starknetDomain"`
+	CollateralAssetID          string        `json:"collateralAssetId"`
 }
 
 // StarknetDomain represents the Starknet domain for signing
