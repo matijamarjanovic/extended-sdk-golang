@@ -1,4 +1,4 @@
-package sdk
+package client
 
 import (
 	"errors"
@@ -24,3 +24,4 @@ func isHexString(s string) error {
 	}
 	return nil
 }
+

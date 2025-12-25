@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/extended-protocol/extended-sdk-golang/src/orders"
 	"github.com/joho/godotenv"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,7 @@ func load() {
 		wd = parent
 	}
 }
-func createTestClient() *APIClient {
+func createTestClient() *Client {
 	cfg := EndpointConfig{
 		APIBaseURL: "https://api.starknet.sepolia.extended.exchange/api/v1",
 	}
@@ -47,25 +48,25 @@ func createTestClient() *APIClient {
 		panic("Failed to create StarkPerpetualAccount: " + err.Error())
 	}
 
-	return NewAPIClient(cfg, apiKey, account, 30*time.Second)
+	return NewClient(cfg, account, 30*time.Second)
 }
 
-func TestAPIClient_GetMarkets_SingleValidMarket(t *testing.T) {
+func TestClient_GetMarkets_SingleValidMarket(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	markets, err := client.GetMarkets(ctx, []string{"BTC-USD"})
+	markets, err := client.Markets.GetMarkets(ctx, []string{"BTC-USD"})
 
 	require.NoError(t, err, "Should not error when requesting BTC-USD market")
 	require.Equal(t, len(markets), 1, "Should return one market for valid request")
 }
 
-func TestAPIClient_GetMarkets_MultipleValidMarkets(t *testing.T) {
+func TestClient_GetMarkets_MultipleValidMarkets(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 	requestedMarkets := []string{"BTC-USD", "ETH-USD"}
 
-	markets, err := client.GetMarkets(ctx, requestedMarkets)
+	markets, err := client.Markets.GetMarkets(ctx, requestedMarkets)
 
 	require.NoError(t, err, "Should not error when requesting multiple valid markets")
 	t.Logf("Requested %v, got %d markets", requestedMarkets, len(markets))
@@ -73,48 +74,49 @@ func TestAPIClient_GetMarkets_MultipleValidMarkets(t *testing.T) {
 	require.Equal(t, len(markets), len(requestedMarkets), "Should return correct number of markets")
 }
 
-func TestAPIClient_GetMarkets_InvalidMarket(t *testing.T) {
+func TestClient_GetMarkets_InvalidMarket(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	markets, err := client.GetMarkets(ctx, []string{"INVALID-MARKET-NAME"})
+	markets, err := client.Markets.GetMarkets(ctx, []string{"INVALID-MARKET-NAME"})
 
 	require.Error(t, err, "Should error when requesting invalid market")
 	assert.Equal(t, len(markets), 0, "Should return zero markets for invalid request")
 }
 
-func TestAPIClient_GetMarkets_ContextTimeout(t *testing.T) {
+func TestClient_GetMarkets_ContextTimeout(t *testing.T) {
 	client := createTestClient()
 
 	// Create context with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
 	defer cancel()
 
-	_, err := client.GetMarkets(ctx, []string{"BTC-USD"})
+	_, err := client.Markets.GetMarkets(ctx, []string{"BTC-USD"})
 
 	require.Error(t, err, "Should error when context times out")
 	t.Logf("Got expected timeout error: %v", err)
 }
 
-func TestAPIClient_GetMarkets_NetworkError(t *testing.T) {
+func TestClient_GetMarkets_NetworkError(t *testing.T) {
 	// Create client with invalid URL
 	cfg := EndpointConfig{
 		APIBaseURL: "http://invalid-url-that-does-not-exist.com",
 	}
-	client := NewAPIClient(cfg, "", nil, 5*time.Second)
+	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
+	client := NewClient(cfg, account, 5*time.Second)
 	ctx := context.Background()
 
-	_, err := client.GetMarkets(ctx, []string{"BTC-USD"})
+	_, err := client.Markets.GetMarkets(ctx, []string{"BTC-USD"})
 
 	require.Error(t, err, "Should error when network request fails")
 	t.Logf("Got expected network error: %v", err)
 }
 
-func TestAPIClient_GetMarketFee_ValidMarket(t *testing.T) {
+func TestClient_GetMarketFee_ValidMarket(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	fees, err := client.GetMarketFee(ctx, "BTC-USD")
+	fees, err := client.Account.GetMarketFee(ctx, "BTC-USD")
 
 	require.NoError(t, err, "Should not error when requesting fees for BTC-USD market")
 	require.Equal(t, len(fees), 1, "Should return one fee entry for valid market")
@@ -125,50 +127,51 @@ func TestAPIClient_GetMarketFee_ValidMarket(t *testing.T) {
 	}
 }
 
-func TestAPIClient_GetMarketFee_InvalidMarket(t *testing.T) {
+func TestClient_GetMarketFee_InvalidMarket(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	fees, err := client.GetMarketFee(ctx, "INVALID-MARKET-NAME")
+	fees, err := client.Account.GetMarketFee(ctx, "INVALID-MARKET-NAME")
 
 	// If no error, should return empty list or no matching fees
 	assert.Error(t, err, "Should error when requesting fees for invalid market")
 	assert.Equal(t, len(fees), 0, "Should return zero fees for invalid market")
 }
 
-func TestAPIClient_GetMarketFee_ContextTimeout(t *testing.T) {
+func TestClient_GetMarketFee_ContextTimeout(t *testing.T) {
 	client := createTestClient()
 
 	// Create context with very short timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
 	defer cancel()
 
-	_, err := client.GetMarketFee(ctx, "BTC-USD")
+	_, err := client.Account.GetMarketFee(ctx, "BTC-USD")
 
 	require.Error(t, err, "Should error when context times out")
 	t.Logf("Got expected timeout error: %v", err)
 }
 
-func TestAPIClient_GetMarketFee_NetworkError(t *testing.T) {
+func TestClient_GetMarketFee_NetworkError(t *testing.T) {
 	// Create client with invalid URL
 	cfg := EndpointConfig{
 		APIBaseURL: "http://invalid-url-that-does-not-exist.com",
 	}
-	client := NewAPIClient(cfg, "", nil, 5*time.Second)
+	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
+	client := NewClient(cfg, account, 5*time.Second)
 	ctx := context.Background()
 
-	_, err := client.GetMarketFee(ctx, "BTC-USD")
+	_, err := client.Account.GetMarketFee(ctx, "BTC-USD")
 
 	require.Error(t, err, "Should error when network request fails")
 	t.Logf("Got expected network error: %v", err)
 }
 
-func TestAPIClient_SubmitOrder_ValidOrder(t *testing.T) {
+func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
 	// First get a market to use for the order
-	markets, err := client.GetMarkets(ctx, []string{"BTC-USD"})
+	markets, err := client.Markets.GetMarkets(ctx, []string{"BTC-USD"})
 	require.NoError(t, err, "Should be able to get BTC-USD market")
 	require.Greater(t, len(markets), 0, "Should have at least one market")
 
@@ -182,9 +185,9 @@ func TestAPIClient_SubmitOrder_ValidOrder(t *testing.T) {
 	nonce := int(time.Now().Unix()) // Use timestamp as nonce for uniqueness
 	expireTime := time.Now().Add(1 * time.Hour)
 
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:          market,
-		Account:         *account,
+		Account:         account,
 		SyntheticAmount: decimal.NewFromFloat(0.001), // Small BTC amount
 		Price:           decimal.NewFromFloat(1),     // Place a low price so that it doesn't match
 		Side:            OrderSideBuy,
@@ -203,12 +206,12 @@ func TestAPIClient_SubmitOrder_ValidOrder(t *testing.T) {
 	}
 
 	// Create the order object
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	require.NoError(t, err, "Should be able to create valid order")
 	require.NotNil(t, order, "Order should not be nil")
 
 	// Submit the order
-	response, err := client.SubmitOrder(ctx, order)
+	response, err := client.Orders.SubmitOrder(ctx, order)
 
 	require.NoError(t, err, "Should not error when submitting valid order")
 

@@ -1,18 +1,38 @@
 package account
 
 import (
-	"github.com/extended-protocol/extended-sdk-golang/src"
+	"context"
+	"fmt"
+
+	"github.com/extended-protocol/extended-sdk-golang/src/client"
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
 )
 
 // Service provides account-related API operations.
-// It holds a reference to the main client to access shared infrastructure.
 type Service struct {
-	Client *sdk.Client // Reference to main client
+	Base *client.BaseModule
+}
+
+// GetMarketFee retrieves current trading fees for a specific market
+func (s *Service) GetMarketFee(ctx context.Context, market string) ([]models.TradingFeeModel, error) {
+	baseUrl, err := s.Base.GetURL("/user/fees", map[string]string{"market": market})
+	if err != nil {
+		return nil, fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	var feeResponse models.FeeResponse
+	if err := s.Base.DoRequest(ctx, "GET", baseUrl, nil, &feeResponse); err != nil {
+		return nil, err
+	}
+
+	if feeResponse.Status != "OK" {
+		return nil, fmt.Errorf("API returned error status: %v", feeResponse.Status)
+	}
+
+	return feeResponse.Data, nil
 }
 
 // Methods to be implemented:
-// - GetMarketFee (move from api_client.go)
 // - GetBalance (new)
 // - GetAccount (new)
 // - GetClient (new)

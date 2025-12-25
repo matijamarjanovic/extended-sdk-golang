@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/extended-protocol/extended-sdk-golang/src/orders"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 )
@@ -78,9 +79,9 @@ func (suite *OrdersTestSuite) SetupTest() {
 
 func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 	// Create order parameters
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:                   suite.market,
-		Account:                  *suite.account,
+		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
 		Side:                     OrderSideSell,
@@ -98,7 +99,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 	}
 
 	// Create the order
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -163,9 +164,9 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 	expiryTime := suite.frozenTime.Add(1 * time.Hour)
 
 	// Create order parameters
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:                   suite.market,
-		Account:                  *suite.account,
+		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
 		Side:                     OrderSideSell,
@@ -183,7 +184,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 	}
 
 	// Create the order
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -260,9 +261,9 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 	expiryTime := time.Date(2024, 1, 5, 1, 8, 56, 860694000, time.UTC).Add(14 * 24 * time.Hour)
 
 	// Create order parameters for buy order
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:                   suite.market,
-		Account:                  *suite.account,
+		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
 		Side:                     OrderSideBuy,
@@ -280,7 +281,7 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 	}
 
 	// Create the order
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -341,9 +342,9 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 	previousOrderID := "previous_custom_id"
 
 	// Create order parameters with previous order ID
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:                   suite.market,
-		Account:                  *suite.account,
+		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
 		Side:                     OrderSideBuy,
@@ -361,7 +362,7 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 	}
 
 	// Create the order
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -384,9 +385,9 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 	customOrderID := "custom_id"
 
 	// Create order parameters with custom order ID
-	params := CreateOrderObjectParams{
+	params := orders.CreateOrderObjectParams{
 		Market:                   suite.market,
-		Account:                  *suite.account,
+		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
 		Side:                     OrderSideBuy,
@@ -404,7 +405,7 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 	}
 
 	// Create the order
-	order, err := CreateOrderObject(params)
+	order, err := orders.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
