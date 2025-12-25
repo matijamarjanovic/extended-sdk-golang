@@ -45,7 +45,7 @@ func createTestClient() *Client {
 		panic("Failed to create StarkPerpetualAccount: " + err.Error())
 	}
 
-	return NewClient(STARKNET_TESTNET_CONFIG, account, 30*time.Second)
+	return NewClient(STARKNET_MAINNET_CONFIG, account, 30*time.Second)
 }
 
 func TestClient_GetMarkets_SingleValidMarket(t *testing.T) {
@@ -96,7 +96,7 @@ func TestClient_GetMarkets_ContextTimeout(t *testing.T) {
 
 func TestClient_GetMarkets_NetworkError(t *testing.T) {
 	// Create client with invalid URL
-	cfg := STARKNET_TESTNET_CONFIG
+	cfg := STARKNET_MAINNET_CONFIG
 	cfg.APIBaseURL = "http://invalid-url-that-does-not-exist.com"
 	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
 	client := NewClient(cfg, account, 5*time.Second)
@@ -149,7 +149,7 @@ func TestClient_GetMarketFee_ContextTimeout(t *testing.T) {
 
 func TestClient_GetMarketFee_NetworkError(t *testing.T) {
 	// Create client with invalid URL
-	cfg := STARKNET_TESTNET_CONFIG
+	cfg := STARKNET_MAINNET_CONFIG
 	cfg.APIBaseURL = "http://invalid-url-that-does-not-exist.com"
 	account, _ := NewStarkPerpetualAccount(0, "0x0", "0x0", "")
 	client := NewClient(cfg, account, 5*time.Second)

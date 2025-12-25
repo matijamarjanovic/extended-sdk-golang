@@ -3,7 +3,7 @@ package sdk
 import "github.com/extended-protocol/extended-sdk-golang/src/models"
 
 // STARKNET_TESTNET_CONFIG is the pre-configured endpoint configuration for Starknet testnet
-const STARKNET_TESTNET_CONFIG = models.EndpointConfig{
+var STARKNET_TESTNET_CONFIG = models.EndpointConfig{
 	ChainRPCURL:              "https://rpc.sepolia.org",
 	APIBaseURL:               "https://api.starknet.sepolia.extended.exchange/api/v1",
 	StreamURL:                "wss://api.starknet.sepolia.extended.exchange/stream.extended.exchange/v1",
@@ -23,7 +23,7 @@ const STARKNET_TESTNET_CONFIG = models.EndpointConfig{
 }
 
 // STARKNET_MAINNET_CONFIG is the pre-configured endpoint configuration for Starknet mainnet
-const STARKNET_MAINNET_CONFIG = models.EndpointConfig{
+var STARKNET_MAINNET_CONFIG = models.EndpointConfig{
 	ChainRPCURL:              "",
 	APIBaseURL:               "https://api.starknet.extended.exchange/api/v1",
 	StreamURL:                "wss://api.starknet.extended.exchange/stream.extended.exchange/v1",
