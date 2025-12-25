@@ -87,7 +87,7 @@ type AccountModel struct {
 	AccountIndex         int      `json:"accountIndex"`
 	Status               string   `json:"status"`
 	L2Key                string   `json:"l2Key"`
-	L2Vault              int      `json:"l2Vault"`
+	L2Vault              string   `json:"l2Vault"`
 	BridgeStarknetAddress *string  `json:"bridgeStarknetAddress,omitempty"`
 	APIKeys              []string `json:"apiKeys,omitempty"`
 }
