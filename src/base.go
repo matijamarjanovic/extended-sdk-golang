@@ -10,11 +10,9 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-)
 
-type EndpointConfig struct {
-	APIBaseURL string
-}
+	"github.com/extended-protocol/extended-sdk-golang/src/models"
+)
 
 var (
 	ErrAPIKeyNotSet       = errors.New("api key is not set")
@@ -23,7 +21,7 @@ var (
 
 // BaseModule provides common functionality for API modules.
 type BaseModule struct {
-	endpointConfig EndpointConfig
+	endpointConfig models.EndpointConfig
 	apiKey         string
 	starkAccount   *StarkPerpetualAccount
 	httpClient     *http.Client
@@ -33,7 +31,7 @@ type BaseModule struct {
 // NewBaseModule constructs a BaseModule with all fields explicitly provided.
 // Pass nil for httpClient to allow lazy creation. Pass nil for starkAccount if intentionally absent.
 func NewBaseModule(
-	cfg EndpointConfig,
+	cfg models.EndpointConfig,
 	apiKey string,
 	starkAccount *StarkPerpetualAccount,
 	httpClient *http.Client,
@@ -48,7 +46,7 @@ func NewBaseModule(
 	}
 }
 
-func (m *BaseModule) EndpointConfig() EndpointConfig {
+func (m *BaseModule) EndpointConfig() models.EndpointConfig {
 	return m.endpointConfig
 }
 

@@ -8,7 +8,7 @@ import (
 // Service provides order-related API operations.
 // It holds a reference to the main client to access shared infrastructure.
 type Service struct {
-	client *sdk.Client // Reference to main client
+	Client *sdk.Client // Reference to main client
 }
 
 // Methods to be implemented:
