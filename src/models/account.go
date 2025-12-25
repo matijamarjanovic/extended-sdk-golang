@@ -130,22 +130,19 @@ type AccountTradeModel struct {
 type AssetOperationType string
 
 const (
-	AssetOperationTypeClaim          AssetOperationType = "CLAIM"
-	AssetOperationTypeDeposit       AssetOperationType = "DEPOSIT"
-	AssetOperationTypeFastWithdrawal AssetOperationType = "FAST_WITHDRAWAL"
-	AssetOperationTypeSlowWithdrawal AssetOperationType = "SLOW_WITHDRAWAL"
-	AssetOperationTypeTransfer       AssetOperationType = "TRANSFER"
+	AssetOperationTypeClaim      AssetOperationType = "CLAIM"
+	AssetOperationTypeDeposit    AssetOperationType = "DEPOSIT"
+	AssetOperationTypeWithdrawal AssetOperationType = "WITHDRAWAL"
+	AssetOperationTypeTransfer   AssetOperationType = "TRANSFER"
 )
 
 type AssetOperationStatus string
 
 const (
-	AssetOperationStatusUnknown        AssetOperationStatus = "UNKNOWN"
-	AssetOperationStatusCreated        AssetOperationStatus = "CREATED"
-	AssetOperationStatusInProgress     AssetOperationStatus = "IN_PROGRESS"
-	AssetOperationStatusRejected       AssetOperationStatus = "REJECTED"
-	AssetOperationStatusReadyForClaim  AssetOperationStatus = "READY_FOR_CLAIM"
-	AssetOperationStatusCompleted      AssetOperationStatus = "COMPLETED"
+	AssetOperationStatusCreated    AssetOperationStatus = "CREATED"
+	AssetOperationStatusInProgress AssetOperationStatus = "IN_PROGRESS"
+	AssetOperationStatusRejected   AssetOperationStatus = "REJECTED"
+	AssetOperationStatusCompleted  AssetOperationStatus = "COMPLETED"
 )
 
 type AssetOperationModel struct {

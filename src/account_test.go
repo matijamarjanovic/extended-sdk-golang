@@ -327,3 +327,99 @@ func TestAccountService_GetBridgeQuote(t *testing.T) {
 	t.Logf("Quote ID: %s, Fee: %s", quote.ID, quote.Fee.String())
 }
 
+func TestAccountService_UpdateLeverage(t *testing.T) {
+	client := createTestClient()
+	ctx := context.Background()
+
+	// First get current leverage
+	leverage, err := client.Account.GetLeverage(ctx, []string{"BTC-USD"})
+	require.NoError(t, err, "Should not error when getting leverage")
+	require.Greater(t, len(leverage), 0, "Should have at least one leverage entry")
+
+	currentLeverage := leverage[0].Leverage
+	newLeverage := decimal.NewFromFloat(2.0) // Set to 2x leverage
+
+	// Update leverage
+	err = client.Account.UpdateLeverage(ctx, "BTC-USD", newLeverage)
+	require.NoError(t, err, "Should not error when updating leverage")
+
+	// Verify the update
+	updatedLeverage, err := client.Account.GetLeverage(ctx, []string{"BTC-USD"})
+	require.NoError(t, err, "Should not error when getting updated leverage")
+	require.Greater(t, len(updatedLeverage), 0, "Should have at least one leverage entry")
+	
+	// Restore original leverage
+	err = client.Account.UpdateLeverage(ctx, "BTC-USD", currentLeverage)
+	require.NoError(t, err, "Should not error when restoring leverage")
+	
+	t.Logf("Updated leverage from %s to %s and restored", currentLeverage.String(), newLeverage.String())
+}
+
+func TestAccountService_CommitBridgeQuote(t *testing.T) {
+	client := createTestClient()
+	ctx := context.Background()
+
+	// First get bridge config and a quote
+	config, err := client.Account.GetBridgeConfig(ctx)
+	if err != nil || len(config.Chains) == 0 {
+		t.Skip("No bridge config available for testing CommitBridgeQuote")
+		return
+	}
+
+	chainIn := "STRK"
+	chainOut := config.Chains[0].Chain
+	amount := decimal.NewFromFloat(1.0)
+
+	quote, err := client.Account.GetBridgeQuote(ctx, chainIn, chainOut, amount)
+	if err != nil {
+		t.Skip("Failed to get bridge quote for testing CommitBridgeQuote")
+		return
+	}
+
+	// Commit the quote
+	err = client.Account.CommitBridgeQuote(ctx, quote.ID)
+	require.NoError(t, err, "Should not error when committing bridge quote")
+	t.Logf("Successfully committed bridge quote with ID: %s", quote.ID)
+}
+
+func TestAccountService_Withdraw(t *testing.T) {
+	t.Skip("Withdraw is not yet implemented")
+}
+
+func TestAccountService_Transfer(t *testing.T) {
+	t.Skip("Transfer is not yet implemented")
+}
+
+func TestAccountService_AssetOperations(t *testing.T) {
+	client := createTestClient()
+	ctx := context.Background()
+
+	// Test getting all asset operations
+	operations, err := client.Account.AssetOperations(ctx, nil, nil, nil, nil, nil, nil, nil)
+
+	require.NoError(t, err, "Should not error when getting asset operations")
+	require.NotNil(t, operations, "Operations should not be nil")
+	t.Logf("Got %d asset operations", len(operations))
+}
+
+func TestAccountService_AssetOperations_WithFilters(t *testing.T) {
+	client := createTestClient()
+	ctx := context.Background()
+
+	// Test with filters
+	operationTypes := []models.AssetOperationType{models.AssetOperationTypeDeposit, models.AssetOperationTypeWithdrawal}
+	operationStatuses := []models.AssetOperationStatus{models.AssetOperationStatusCompleted}
+	limit := 10
+
+	operations, err := client.Account.AssetOperations(ctx, nil, operationTypes, operationStatuses, nil, nil, nil, &limit)
+
+	require.NoError(t, err, "Should not error when getting asset operations with filters")
+	require.NotNil(t, operations, "Operations should not be nil")
+	assert.LessOrEqual(t, len(operations), limit, "Should respect limit")
+	t.Logf("Got %d asset operations with filters", len(operations))
+	
+	for _, op := range operations {
+		t.Logf("Operation ID: %s, Type: %s, Status: %s, Amount: %s", op.ID, op.Type, op.Status, op.Amount.String())
+	}
+}
+

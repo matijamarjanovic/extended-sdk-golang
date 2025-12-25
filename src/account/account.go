@@ -1,8 +1,12 @@
 package account
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/url"
+	"strconv"
 
 	"github.com/extended-protocol/extended-sdk-golang/src/client"
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
@@ -426,9 +430,149 @@ func (s *Service) GetBridgeQuote(ctx context.Context, chainIn, chainOut string, 
 	return &quoteResponse.Data, nil
 }
 
-// Methods to be implemented:
-// - UpdateLeverage (new)
-// - CommitBridgeQuote (new)
-// - Transfer (new)
-// - Withdraw (new)
-// - AssetOperations (new)
+// UpdateLeverage updates the leverage for a specific market
+func (s *Service) UpdateLeverage(ctx context.Context, marketName string, leverage decimal.Decimal) error {
+	baseUrl, err := s.Base.GetURL("/user/leverage", nil)
+	if err != nil {
+		return fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	// Create request body
+	requestBody := models.AccountLeverage{
+		Market:   marketName,
+		Leverage: leverage,
+	}
+
+	// Marshal to JSON
+	jsonData, err := json.Marshal(requestBody)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request body: %w", err)
+	}
+
+	// Create buffer with JSON data
+	body := bytes.NewBuffer(jsonData)
+
+	var emptyResponse models.EmptyResponse
+	if err := s.Base.DoRequest(ctx, "PATCH", baseUrl, body, &emptyResponse); err != nil {
+		return err
+	}
+
+	if emptyResponse.Status != "OK" {
+		return fmt.Errorf("API returned error status: %v", emptyResponse.Status)
+	}
+
+	return nil
+}
+
+// CommitBridgeQuote commits a bridge quote
+func (s *Service) CommitBridgeQuote(ctx context.Context, id string) error {
+	query := map[string]string{
+		"id": id,
+	}
+
+	baseUrl, err := s.Base.GetURL("/user/bridge/quote", query)
+	if err != nil {
+		return fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	var emptyResponse models.EmptyResponse
+	if err := s.Base.DoRequest(ctx, "POST", baseUrl, nil, &emptyResponse); err != nil {
+		return err
+	}
+
+	if emptyResponse.Status != "OK" {
+		return fmt.Errorf("API returned error status: %v", emptyResponse.Status)
+	}
+
+	return nil
+}
+
+// Withdraw performs a withdrawal
+// TODO: Implement withdrawal functionality with proper signing using withdrawal object builder
+// This requires creating a withdrawal object similar to create_withdrawal_object in Python SDK
+// The withdrawal object needs to be signed and should use the endpoint /user/withdrawal
+func (s *Service) Withdraw(
+	ctx context.Context,
+	amount decimal.Decimal,
+	chainID string,
+	starkAddress *string,
+	nonce *int,
+	quoteID *string,
+) (*int, error) {
+	// TODO: Implement withdrawal
+	_ = ctx
+	_ = amount
+	_ = chainID
+	_ = starkAddress
+	_ = nonce
+	_ = quoteID
+	return nil, fmt.Errorf("Withdraw is not yet implemented")
+}
+
+// Transfer performs an on-chain transfer
+// TODO: Implement transfer functionality with proper signing using transfer object builder
+// This requires creating a transfer object similar to create_transfer_object in Python SDK
+func (s *Service) Transfer(
+	ctx context.Context,
+	toVault uint64,
+	toL2Key string,
+	amount decimal.Decimal,
+	nonce *int,
+) (interface{}, error) {
+	// TODO: Implement transfer
+	return nil, fmt.Errorf("Transfer is not yet implemented")
+}
+
+// AssetOperations retrieves asset operations history
+func (s *Service) AssetOperations(
+	ctx context.Context,
+	id *string,
+	operationTypes []models.AssetOperationType,
+	operationStatuses []models.AssetOperationStatus,
+	startTime *int,
+	endTime *int,
+	cursor *int,
+	limit *int,
+) ([]models.AssetOperationModel, error) {
+	// Build URL manually to handle multiple query parameters with the same key
+	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/assetOperations"
+	query := make(url.Values)
+	
+	if id != nil {
+		query.Set("id", *id)
+	}
+	for _, opType := range operationTypes {
+		query.Add("type", string(opType))
+	}
+	for _, opStatus := range operationStatuses {
+		query.Add("status", string(opStatus))
+	}
+	if startTime != nil {
+		query.Set("startTime", strconv.Itoa(*startTime))
+	}
+	if endTime != nil {
+		query.Set("endTime", strconv.Itoa(*endTime))
+	}
+	if cursor != nil {
+		query.Set("cursor", strconv.Itoa(*cursor))
+	}
+	if limit != nil {
+		query.Set("limit", strconv.Itoa(*limit))
+	}
+
+	url := baseUrl
+	if len(query) > 0 {
+		url += "?" + query.Encode()
+	}
+
+	var assetOperationsResponse models.AssetOperationsResponse
+	if err := s.Base.DoRequest(ctx, "GET", url, nil, &assetOperationsResponse); err != nil {
+		return nil, err
+	}
+
+	if assetOperationsResponse.Status != "OK" {
+		return nil, fmt.Errorf("API returned error status: %v", assetOperationsResponse.Status)
+	}
+
+	return assetOperationsResponse.Data, nil
+}
