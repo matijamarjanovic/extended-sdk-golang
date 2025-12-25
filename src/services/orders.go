@@ -1,4 +1,4 @@
-package orders
+package services
 
 import (
 	"bytes"
@@ -10,13 +10,13 @@ import (
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
 )
 
-// Service provides order-related API operations.
-type Service struct {
+// OrdersService provides order-related API operations.
+type OrdersService struct {
 	Base *client.BaseClient
 }
 
 // SubmitOrder submits a perpetual order to the trading API
-func (s *Service) SubmitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
+func (s *OrdersService) SubmitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
 	// Validate order object is complete and properly signed
 	if order == nil {
 		return nil, fmt.Errorf("order is nil")
@@ -60,6 +60,4 @@ func (s *Service) SubmitOrder(ctx context.Context, order *models.PerpetualOrderM
 // - MassCancel (new)
 //
 // Split into multiple files (e.g., orders_cancel.go) as code grows
-
-
 

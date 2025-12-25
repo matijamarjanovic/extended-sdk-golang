@@ -2,51 +2,14 @@ package sdk
 
 import (
 	"context"
-	"os"
-	"path/filepath"
-	"strconv"
 	"testing"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/orders"
-	"github.com/joho/godotenv"
+	"github.com/extended-protocol/extended-sdk-golang/src/services"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func init() { load() }
-
-func load() {
-	wd, _ := os.Getwd()
-	for {
-		p := filepath.Join(wd, ".env")
-		if _, err := os.Stat(p); err == nil {
-			_ = godotenv.Load(p)
-			return
-		}
-		parent := filepath.Dir(wd)
-		if parent == wd {
-			return
-		}
-		wd = parent
-	}
-}
-func createTestClient() *Client {
-	apiKey := os.Getenv("TEST_API_KEY")
-	vaultStr := os.Getenv("TEST_VAULT")
-	vault, _ := strconv.ParseUint(vaultStr, 10, 64)
-	publicKey := os.Getenv("TEST_PUBLIC_KEY")
-	privateKey := os.Getenv("TEST_PRIVATE_KEY")
-
-	account, err := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
-
-	if err != nil {
-		panic("Failed to create StarkPerpetualAccount: " + err.Error())
-	}
-
-	return NewClient(STARKNET_MAINNET_CONFIG, account, 30*time.Second)
-}
 
 func TestClient_GetMarkets_SingleValidMarket(t *testing.T) {
 	client := createTestClient()
@@ -183,7 +146,7 @@ func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 	// Get config from client to use its StarknetDomain
 	cfg := client.EndpointConfig()
 
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:          market,
 		Account:         account,
 		SyntheticAmount: decimal.NewFromFloat(0.001), // Small BTC amount
@@ -199,7 +162,7 @@ func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 	}
 
 	// Create the order object
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	require.NoError(t, err, "Should be able to create valid order")
 	require.NotNil(t, order, "Order should not be nil")
 

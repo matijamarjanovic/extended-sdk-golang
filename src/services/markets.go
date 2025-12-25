@@ -1,4 +1,4 @@
-package markets
+package services
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
 )
 
-// Service provides market-related API operations.
-type Service struct {
+// MarketsService provides market-related API operations.
+type MarketsService struct {
 	Base *client.BaseClient
 }
 
 // GetMarkets retrieves all available markets from the API
-func (s *Service) GetMarkets(ctx context.Context, market []string) ([]models.MarketModel, error) {
+func (s *MarketsService) GetMarkets(ctx context.Context, market []string) ([]models.MarketModel, error) {
 	baseURL := s.Base.EndpointConfig().APIBaseURL + "/info/markets"
 
 	if len(market) > 0 {
@@ -40,7 +40,7 @@ func (s *Service) GetMarkets(ctx context.Context, market []string) ([]models.Mar
 }
 
 // GetMarketsDict retrieves all markets and returns them as a dictionary/map keyed by market name
-func (s *Service) GetMarketsDict(ctx context.Context) (map[string]models.MarketModel, error) {
+func (s *MarketsService) GetMarketsDict(ctx context.Context) (map[string]models.MarketModel, error) {
 	markets, err := s.GetMarkets(ctx, []string{})
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *Service) GetMarketsDict(ctx context.Context) (map[string]models.MarketM
 }
 
 // GetMarketStatistics retrieves market statistics for a specific market
-func (s *Service) GetMarketStatistics(ctx context.Context, marketName string) (*models.MarketStatsModel, error) {
+func (s *MarketsService) GetMarketStatistics(ctx context.Context, marketName string) (*models.MarketStatsModel, error) {
 	baseUrl, err := s.Base.GetURL(fmt.Sprintf("/info/markets/%s/stats", marketName), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -74,7 +74,7 @@ func (s *Service) GetMarketStatistics(ctx context.Context, marketName string) (*
 }
 
 // GetCandlesHistory retrieves candle history for a specific market
-func (s *Service) GetCandlesHistory(
+func (s *MarketsService) GetCandlesHistory(
 	ctx context.Context,
 	marketName string,
 	candleType models.CandleType,
@@ -113,7 +113,7 @@ func (s *Service) GetCandlesHistory(
 }
 
 // GetFundingRatesHistory retrieves funding rates history for a specific market
-func (s *Service) GetFundingRatesHistory(
+func (s *MarketsService) GetFundingRatesHistory(
 	ctx context.Context,
 	marketName string,
 	startTime time.Time,
@@ -142,7 +142,7 @@ func (s *Service) GetFundingRatesHistory(
 }
 
 // GetOrderbookSnapshot retrieves the orderbook snapshot for a specific market
-func (s *Service) GetOrderbookSnapshot(ctx context.Context, marketName string) (*models.OrderbookUpdateModel, error) {
+func (s *MarketsService) GetOrderbookSnapshot(ctx context.Context, marketName string) (*models.OrderbookUpdateModel, error) {
 	baseUrl, err := s.Base.GetURL(fmt.Sprintf("/info/markets/%s/orderbook", marketName), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -159,3 +159,4 @@ func (s *Service) GetOrderbookSnapshot(ctx context.Context, marketName string) (
 
 	return &orderbookResponse.Data, nil
 }
+

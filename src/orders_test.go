@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/orders"
+	"github.com/extended-protocol/extended-sdk-golang/src/services"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 )
@@ -79,7 +79,7 @@ func (suite *OrdersTestSuite) SetupTest() {
 
 func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 	// Create order parameters
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
@@ -99,7 +99,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 	}
 
 	// Create the order
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -164,7 +164,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 	expiryTime := suite.frozenTime.Add(1 * time.Hour)
 
 	// Create order parameters
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
@@ -184,7 +184,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 	}
 
 	// Create the order
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -261,7 +261,7 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 	expiryTime := time.Date(2024, 1, 5, 1, 8, 56, 860694000, time.UTC).Add(14 * 24 * time.Hour)
 
 	// Create order parameters for buy order
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
@@ -281,7 +281,7 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 	}
 
 	// Create the order
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -342,7 +342,7 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 	previousOrderID := "previous_custom_id"
 
 	// Create order parameters with previous order ID
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
@@ -362,7 +362,7 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 	}
 
 	// Create the order
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -385,7 +385,7 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 	customOrderID := "custom_id"
 
 	// Create order parameters with custom order ID
-	params := orders.CreateOrderObjectParams{
+	params := services.CreateOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
@@ -405,7 +405,7 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 	}
 
 	// Create the order
-	order, err := orders.CreateOrderObject(params)
+	order, err := services.CreateOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 

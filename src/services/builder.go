@@ -1,4 +1,4 @@
-package orders
+package services
 
 import (
 	"fmt"
@@ -143,7 +143,7 @@ func CreateOrderObject(params CreateOrderObjectParams) (*models.PerpetualOrderMo
 		CancelID:                 params.PreviousOrderExternalID,
 		Settlement:               settlement,
 		BuilderFee:               fee_builder_str,
-		BuilderID:                params.BuilderID,
+		BuilderID:                  params.BuilderID,
 	}
 
 	return order, nil
@@ -192,7 +192,7 @@ func HashOrder(params HashOrderParams) (string, error) {
 		params.StarknetDomain.Name,                 // domain_name
 		params.StarknetDomain.Version,              // domain_version
 		params.StarknetDomain.ChainID,              // domain_chain_id
-		params.StarknetDomain.Revision,             // domain_revision
+		params.StarknetDomain.Revision,               // domain_revision
 	)
 
 	if err != nil {
@@ -201,3 +201,4 @@ func HashOrder(params HashOrderParams) (string, error) {
 
 	return hash, nil
 }
+

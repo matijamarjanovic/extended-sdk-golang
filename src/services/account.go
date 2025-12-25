@@ -1,4 +1,4 @@
-package account
+package services
 
 import (
 	"bytes"
@@ -13,13 +13,13 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// Service provides account-related API operations.
-type Service struct {
+// AccountService provides account-related API operations.
+type AccountService struct {
 	Base *client.BaseClient
 }
 
 // GetAccount retrieves account information
-func (s *Service) GetAccount(ctx context.Context) (*models.AccountModel, error) {
+func (s *AccountService) GetAccount(ctx context.Context) (*models.AccountModel, error) {
 	baseUrl, err := s.Base.GetURL("/user/account/info", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -38,7 +38,7 @@ func (s *Service) GetAccount(ctx context.Context) (*models.AccountModel, error) 
 }
 
 // GetClient retrieves client information
-func (s *Service) GetClient(ctx context.Context) (*models.ClientModel, error) {
+func (s *AccountService) GetClient(ctx context.Context) (*models.ClientModel, error) {
 	baseUrl, err := s.Base.GetURL("/user/client/info", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -57,7 +57,7 @@ func (s *Service) GetClient(ctx context.Context) (*models.ClientModel, error) {
 }
 
 // GetBalance retrieves account balance information
-func (s *Service) GetBalance(ctx context.Context) (*models.BalanceModel, error) {
+func (s *AccountService) GetBalance(ctx context.Context) (*models.BalanceModel, error) {
 	baseUrl, err := s.Base.GetURL("/user/balance", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -76,7 +76,7 @@ func (s *Service) GetBalance(ctx context.Context) (*models.BalanceModel, error) 
 }
 
 // GetMarketFee retrieves current trading fees for a specific market
-func (s *Service) GetMarketFee(ctx context.Context, market string) ([]models.TradingFeeModel, error) {
+func (s *AccountService) GetMarketFee(ctx context.Context, market string) ([]models.TradingFeeModel, error) {
 	baseUrl, err := s.Base.GetURL("/user/fees", map[string]string{"market": market})
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -95,7 +95,7 @@ func (s *Service) GetMarketFee(ctx context.Context, market string) ([]models.Tra
 }
 
 // GetFees retrieves trading fees for specified markets (matches Python SDK signature)
-func (s *Service) GetFees(ctx context.Context, marketNames []string, builderID *int) ([]models.TradingFeeModel, error) {
+func (s *AccountService) GetFees(ctx context.Context, marketNames []string, builderID *int) ([]models.TradingFeeModel, error) {
 	// Build URL with query parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/fees"
 	
@@ -129,7 +129,7 @@ func (s *Service) GetFees(ctx context.Context, marketNames []string, builderID *
 }
 
 // GetPositions retrieves current positions, optionally filtered by market names and position side
-func (s *Service) GetPositions(ctx context.Context, marketNames []string, positionSide *models.PositionSide) ([]models.PositionModel, error) {
+func (s *AccountService) GetPositions(ctx context.Context, marketNames []string, positionSide *models.PositionSide) ([]models.PositionModel, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions"
 	queryParts := []string{}
@@ -161,7 +161,7 @@ func (s *Service) GetPositions(ctx context.Context, marketNames []string, positi
 }
 
 // GetPositionsHistory retrieves position history with optional filters
-func (s *Service) GetPositionsHistory(ctx context.Context, marketNames []string, positionSide *models.PositionSide, cursor *int, limit *int) ([]models.PositionHistoryModel, error) {
+func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []string, positionSide *models.PositionSide, cursor *int, limit *int) ([]models.PositionHistoryModel, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions/history"
 	queryParts := []string{}
@@ -199,7 +199,7 @@ func (s *Service) GetPositionsHistory(ctx context.Context, marketNames []string,
 }
 
 // GetOpenOrders retrieves open orders with optional filters
-func (s *Service) GetOpenOrders(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide) ([]models.OpenOrderModel, error) {
+func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide) ([]models.OpenOrderModel, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders"
 	queryParts := []string{}
@@ -234,7 +234,7 @@ func (s *Service) GetOpenOrders(ctx context.Context, marketNames []string, order
 }
 
 // GetOrdersHistory retrieves order history with optional filters
-func (s *Service) GetOrdersHistory(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide, cursor *int, limit *int) ([]models.OpenOrderModel, error) {
+func (s *AccountService) GetOrdersHistory(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide, cursor *int, limit *int) ([]models.OpenOrderModel, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders/history"
 	queryParts := []string{}
@@ -275,7 +275,7 @@ func (s *Service) GetOrdersHistory(ctx context.Context, marketNames []string, or
 }
 
 // GetOrderByID retrieves an order by its ID
-func (s *Service) GetOrderByID(ctx context.Context, orderID int) (*models.OpenOrderModel, error) {
+func (s *AccountService) GetOrderByID(ctx context.Context, orderID int) (*models.OpenOrderModel, error) {
 	baseUrl, err := s.Base.GetURL(fmt.Sprintf("/user/orders/%d", orderID), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -298,7 +298,7 @@ func (s *Service) GetOrderByID(ctx context.Context, orderID int) (*models.OpenOr
 }
 
 // GetOrderByExternalID retrieves orders by external ID
-func (s *Service) GetOrderByExternalID(ctx context.Context, externalID string) ([]models.OpenOrderModel, error) {
+func (s *AccountService) GetOrderByExternalID(ctx context.Context, externalID string) ([]models.OpenOrderModel, error) {
 	baseUrl, err := s.Base.GetURL(fmt.Sprintf("/user/orders/external/%s", externalID), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -317,7 +317,7 @@ func (s *Service) GetOrderByExternalID(ctx context.Context, externalID string) (
 }
 
 // GetTrades retrieves trades with optional filters
-func (s *Service) GetTrades(ctx context.Context, marketNames []string, tradeSide *models.OrderSide, tradeType *models.TradeType, cursor *int, limit *int) ([]models.AccountTradeModel, error) {
+func (s *AccountService) GetTrades(ctx context.Context, marketNames []string, tradeSide *models.OrderSide, tradeType *models.TradeType, cursor *int, limit *int) ([]models.AccountTradeModel, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/trades"
 	queryParts := []string{}
@@ -358,7 +358,7 @@ func (s *Service) GetTrades(ctx context.Context, marketNames []string, tradeSide
 }
 
 // GetLeverage retrieves leverage for specified markets
-func (s *Service) GetLeverage(ctx context.Context, marketNames []string) ([]models.AccountLeverage, error) {
+func (s *AccountService) GetLeverage(ctx context.Context, marketNames []string) ([]models.AccountLeverage, error) {
 	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/leverage"
 	queryParts := []string{}
@@ -387,7 +387,7 @@ func (s *Service) GetLeverage(ctx context.Context, marketNames []string) ([]mode
 }
 
 // GetBridgeConfig retrieves the bridge configuration
-func (s *Service) GetBridgeConfig(ctx context.Context) (*models.BridgesConfig, error) {
+func (s *AccountService) GetBridgeConfig(ctx context.Context) (*models.BridgesConfig, error) {
 	baseUrl, err := s.Base.GetURL("/user/bridge/config", nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build URL: %w", err)
@@ -406,7 +406,7 @@ func (s *Service) GetBridgeConfig(ctx context.Context) (*models.BridgesConfig, e
 }
 
 // GetBridgeQuote retrieves a bridge quote
-func (s *Service) GetBridgeQuote(ctx context.Context, chainIn, chainOut string, amount decimal.Decimal) (*models.Quote, error) {
+func (s *AccountService) GetBridgeQuote(ctx context.Context, chainIn, chainOut string, amount decimal.Decimal) (*models.Quote, error) {
 	query := map[string]string{
 		"chainIn":  chainIn,
 		"chainOut": chainOut,
@@ -431,7 +431,7 @@ func (s *Service) GetBridgeQuote(ctx context.Context, chainIn, chainOut string, 
 }
 
 // UpdateLeverage updates the leverage for a specific market
-func (s *Service) UpdateLeverage(ctx context.Context, marketName string, leverage decimal.Decimal) error {
+func (s *AccountService) UpdateLeverage(ctx context.Context, marketName string, leverage decimal.Decimal) error {
 	baseUrl, err := s.Base.GetURL("/user/leverage", nil)
 	if err != nil {
 		return fmt.Errorf("failed to build URL: %w", err)
@@ -465,7 +465,7 @@ func (s *Service) UpdateLeverage(ctx context.Context, marketName string, leverag
 }
 
 // CommitBridgeQuote commits a bridge quote
-func (s *Service) CommitBridgeQuote(ctx context.Context, id string) error {
+func (s *AccountService) CommitBridgeQuote(ctx context.Context, id string) error {
 	query := map[string]string{
 		"id": id,
 	}
@@ -491,7 +491,7 @@ func (s *Service) CommitBridgeQuote(ctx context.Context, id string) error {
 // TODO: Implement withdrawal functionality with proper signing using withdrawal object builder
 // This requires creating a withdrawal object similar to create_withdrawal_object in Python SDK
 // The withdrawal object needs to be signed and should use the endpoint /user/withdrawal
-func (s *Service) Withdraw(
+func (s *AccountService) Withdraw(
 	ctx context.Context,
 	amount decimal.Decimal,
 	chainID string,
@@ -512,7 +512,7 @@ func (s *Service) Withdraw(
 // Transfer performs an on-chain transfer
 // TODO: Implement transfer functionality with proper signing using transfer object builder
 // This requires creating a transfer object similar to create_transfer_object in Python SDK
-func (s *Service) Transfer(
+func (s *AccountService) Transfer(
 	ctx context.Context,
 	toVault uint64,
 	toL2Key string,
@@ -524,7 +524,7 @@ func (s *Service) Transfer(
 }
 
 // AssetOperations retrieves asset operations history
-func (s *Service) AssetOperations(
+func (s *AccountService) AssetOperations(
 	ctx context.Context,
 	id *string,
 	operationTypes []models.AssetOperationType,
@@ -576,3 +576,4 @@ func (s *Service) AssetOperations(
 
 	return assetOperationsResponse.Data, nil
 }
+

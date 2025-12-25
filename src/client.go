@@ -3,11 +3,9 @@ package sdk
 import (
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/account"
 	"github.com/extended-protocol/extended-sdk-golang/src/client"
-	"github.com/extended-protocol/extended-sdk-golang/src/markets"
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
-	"github.com/extended-protocol/extended-sdk-golang/src/orders"
+	"github.com/extended-protocol/extended-sdk-golang/src/services"
 )
 
 // Client provides REST API functionality for perpetual trading.
@@ -15,9 +13,9 @@ import (
 // It provides access to domain-specific services through the Account, Orders, and Markets fields.
 type Client struct {
 	*client.BaseClient
-	Account *account.Service
-	Orders  *orders.Service
-	Markets *markets.Service
+	Account *services.AccountService
+	Orders  *services.OrdersService
+	Markets *services.MarketsService
 }
 
 // NewClient creates a new Client instance with all services initialized.
@@ -33,9 +31,9 @@ func NewClient(
 	}
 
 	// Initialize services with reference to BaseClient
-	sdkClient.Account = &account.Service{Base: baseClient}
-	sdkClient.Orders = &orders.Service{Base: baseClient}
-	sdkClient.Markets = &markets.Service{Base: baseClient}
+	sdkClient.Account = &services.AccountService{Base: baseClient}
+	sdkClient.Orders = &services.OrdersService{Base: baseClient}
+	sdkClient.Markets = &services.MarketsService{Base: baseClient}
 
 	return sdkClient
 }
