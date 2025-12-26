@@ -17,44 +17,6 @@ type OrdersService struct {
 	Base *client.BaseClient
 }
 
-// submitOrder submits a perpetual order to the trading API
-func (s *OrdersService) submitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
-	// Validate order object is complete and properly signed
-	if order == nil {
-		return nil, fmt.Errorf("order is nil")
-	}
-
-	baseUrl, err := s.Base.GetURL("/user/order", nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to build URL: %w", err)
-	}
-
-	// Marshal the order to JSON
-	orderJSON, err := json.Marshal(order)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal order to JSON: %w", err)
-	}
-
-	// Create a buffer with the JSON data
-	jsonData := bytes.NewBuffer(orderJSON)
-
-	// Use the DoRequest method to handle the HTTP request and JSON parsing
-	var orderResponse models.OrderResponse
-	if err := s.Base.DoRequest(ctx, "POST", baseUrl, jsonData, &orderResponse); err != nil {
-		return nil, err
-	}
-
-	if orderResponse.Status != "OK" {
-		return nil, fmt.Errorf("API returned error status: %v", orderResponse.Status)
-	}
-
-	if orderResponse.Data.ExternalID != order.ID {
-		return nil, fmt.Errorf("mismatched order ID in response: got %s, expected %s", orderResponse.Data.ExternalID, order.ID)
-	}
-
-	return &orderResponse, nil
-}
-
 // PlaceOrder creates an order object and submits it to the exchange.
 // Required parameters are passed as function arguments, optional parameters are passed as options.
 // It uses the account from the service's BaseClient and always uses account.Sign as the signer.
@@ -139,10 +101,135 @@ func (s *OrdersService) PlaceOrder(
 	return s.submitOrder(ctx, order)
 }
 
-// Methods to be implemented:
-// - CancelOrder (new)
-// - CancelOrderByExternalID (new)
-// - MassCancel (new)
-//
-// Split into multiple files (e.g., orders_cancel.go) as code grows
+// CancelOrder cancels an order by its internal order ID.
+// https://api.docs.extended.exchange/#cancel-order
+func (s *OrdersService) CancelOrder(ctx context.Context, orderID int) error {
+	baseUrl, err := s.Base.GetURL(fmt.Sprintf("/user/order/%d", orderID), nil)
+	if err != nil {
+		return fmt.Errorf("failed to build URL: %w", err)
+	}
 
+	var emptyResponse models.EmptyResponse
+	if err := s.Base.DoRequest(ctx, "DELETE", baseUrl, nil, &emptyResponse); err != nil {
+		return err
+	}
+
+	if emptyResponse.Status != "OK" {
+		return fmt.Errorf("API returned error status: %v", emptyResponse.Status)
+	}
+
+	return nil
+}
+
+// CancelOrderByExternalID cancels an order by its external ID.
+// https://api.docs.extended.exchange/#cancel-order
+func (s *OrdersService) CancelOrderByExternalID(ctx context.Context, externalID string) error {
+	query := map[string]string{
+		"externalId": externalID,
+	}
+	baseUrl, err := s.Base.GetURL("/user/order", query)
+	if err != nil {
+		return fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	var emptyResponse models.EmptyResponse
+	if err := s.Base.DoRequest(ctx, "DELETE", baseUrl, nil, &emptyResponse); err != nil {
+		return err
+	}
+
+	if emptyResponse.Status != "OK" {
+		return fmt.Errorf("API returned error status: %v", emptyResponse.Status)
+	}
+
+	return nil
+}
+
+// MassCancelRequest represents the request parameters for mass cancel operation
+type MassCancelRequest struct {
+	OrderIDs         []int    `json:"orderIds,omitempty"`
+	ExternalOrderIDs []string `json:"externalOrderIds,omitempty"`
+	Markets          []string `json:"markets,omitempty"`
+	CancelAll        *bool    `json:"cancelAll,omitempty"`
+}
+
+// MassCancel cancels multiple orders based on the provided criteria.
+// https://api.docs.extended.exchange/#mass-cancel
+func (s *OrdersService) MassCancel(
+	ctx context.Context,
+	orderIDs []int,
+	externalOrderIDs []string,
+	markets []string,
+	cancelAll bool,
+) error {
+	baseUrl, err := s.Base.GetURL("/user/order/massCancel", nil)
+	if err != nil {
+		return fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	request := MassCancelRequest{
+		OrderIDs:         orderIDs,
+		ExternalOrderIDs: externalOrderIDs,
+		Markets:          markets,
+	}
+	if cancelAll {
+		request.CancelAll = &cancelAll
+	}
+
+	// Marshal the request to JSON
+	requestJSON, err := json.Marshal(request)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request to JSON: %w", err)
+	}
+
+	// Create a buffer with the JSON data
+	jsonData := bytes.NewBuffer(requestJSON)
+
+	var emptyResponse models.EmptyResponse
+	if err := s.Base.DoRequest(ctx, "POST", baseUrl, jsonData, &emptyResponse); err != nil {
+		return err
+	}
+
+	if emptyResponse.Status != "OK" {
+		return fmt.Errorf("API returned error status: %v", emptyResponse.Status)
+	}
+
+	return nil
+}
+
+// submitOrder submits a perpetual order to the trading API
+func (s *OrdersService) submitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
+	// Validate order object is complete and properly signed
+	if order == nil {
+		return nil, fmt.Errorf("order is nil")
+	}
+
+	baseUrl, err := s.Base.GetURL("/user/order", nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build URL: %w", err)
+	}
+
+	// Marshal the order to JSON
+	orderJSON, err := json.Marshal(order)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal order to JSON: %w", err)
+	}
+
+	// Create a buffer with the JSON data
+	jsonData := bytes.NewBuffer(orderJSON)
+
+	// Use the DoRequest method to handle the HTTP request and JSON parsing
+	var orderResponse models.OrderResponse
+	if err := s.Base.DoRequest(ctx, "POST", baseUrl, jsonData, &orderResponse); err != nil {
+		return nil, err
+	}
+
+	if orderResponse.Status != "OK" {
+		return nil, fmt.Errorf("API returned error status: %v", orderResponse.Status)
+	}
+
+	if orderResponse.Data.ExternalID != order.ID {
+		return nil, fmt.Errorf("mismatched order ID in response: got %s, expected %s", orderResponse.Data.ExternalID, order.ID)
+	}
+
+	return &orderResponse, nil
+}
