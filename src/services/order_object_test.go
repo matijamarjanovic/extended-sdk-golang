@@ -1,11 +1,12 @@
-package sdk
+package services
 
 import (
 	"encoding/json"
 	"testing"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/services"
+	"github.com/extended-protocol/extended-sdk-golang/src/client"
+	"github.com/extended-protocol/extended-sdk-golang/src/models"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 )
@@ -20,19 +21,19 @@ const (
 )
 
 // Test helper functions
-func createTestAccount() (*StarkPerpetualAccount, error) {
-	return NewStarkPerpetualAccount(TestVaultID, TestPrivateKeyHex, TestPublicKeyHex, TestAPIKey)
+func createTestAccount() (*client.StarkPerpetualAccount, error) {
+	return client.NewStarkPerpetualAccount(TestVaultID, TestPrivateKeyHex, TestPublicKeyHex, TestAPIKey)
 }
 
-func createTestBTCUSDMarket() MarketModel {
-	return MarketModel{
+func createTestBTCUSDMarket() models.MarketModel {
+	return models.MarketModel{
 		Name:                     "BTC-USD",
 		AssetName:                "BTC",
 		AssetPrecision:           8,
 		CollateralAssetName:      "USD",
 		CollateralAssetPrecision: 6,
 		Active:                   true,
-		L2Config: L2ConfigModel{
+		L2Config: models.L2ConfigModel{
 			Type:                 "perpetual",
 			CollateralID:         "0x31857064564ed0ff978e687456963cba09c2c6985d8f9300a1de4962fafa054",
 			CollateralResolution: 1000000, // 6 decimals
@@ -42,8 +43,8 @@ func createTestBTCUSDMarket() MarketModel {
 	}
 }
 
-func createTestStarknetDomain() StarknetDomain {
-	return StarknetDomain{
+func createTestStarknetDomain() models.StarknetDomain {
+	return models.StarknetDomain{
 		Name:     "Perpetuals",
 		Version:  "v0",
 		ChainID:  "SN_SEPOLIA",
@@ -58,9 +59,9 @@ func createTestFrozenTime() time.Time {
 // OrdersTestSuite defines the test suite
 type OrdersTestSuite struct {
 	suite.Suite
-	account        *StarkPerpetualAccount
-	market         MarketModel
-	starknetDomain StarknetDomain
+	account        *client.StarkPerpetualAccount
+	market         models.MarketModel
+	starknetDomain models.StarknetDomain
 	frozenTime     time.Time
 	nonce          int
 }
@@ -79,27 +80,28 @@ func (suite *OrdersTestSuite) SetupTest() {
 
 func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 	// Create order parameters
-	params := services.CreateOrderObjectParams{
+	expireTime := suite.frozenTime.Add(1 * time.Hour)
+	params := createOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
-		Side:                     OrderSideSell,
-		Signer:                   suite.account.Sign,
+		Side:                     models.OrderSideSell,
+		Type:                     models.OrderTypeLimit,
 		StarknetDomain:           suite.starknetDomain,
-		ExpireTime:               nil,
+		ExpireTime:               expireTime,
 		PostOnly:                 false,
 		PreviousOrderExternalID:  nil,
 		OrderExternalID:          nil,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionAccount,
-		Nonce:                    &suite.nonce,
+		TimeInForce:              models.TimeInForceGTT,
+		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
+		Nonce:                    suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
 
 	// Create the order
-	order, err := services.CreateOrderObject(params)
+	order, err := createOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -164,27 +166,27 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 	expiryTime := suite.frozenTime.Add(1 * time.Hour)
 
 	// Create order parameters
-	params := services.CreateOrderObjectParams{
+	params := createOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
-		Side:                     OrderSideSell,
-		Signer:                   suite.account.Sign,
+		Side:                     models.OrderSideSell,
+		Type:                     models.OrderTypeLimit,
 		StarknetDomain:           suite.starknetDomain,
-		ExpireTime:               &expiryTime,
+		ExpireTime:               expiryTime,
 		PostOnly:                 false,
 		PreviousOrderExternalID:  nil,
 		OrderExternalID:          nil,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionAccount,
-		Nonce:                    &suite.nonce,
+		TimeInForce:              models.TimeInForceGTT,
+		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
+		Nonce:                    suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
 
 	// Create the order
-	order, err := services.CreateOrderObject(params)
+	order, err := createOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -261,27 +263,27 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 	expiryTime := time.Date(2024, 1, 5, 1, 8, 56, 860694000, time.UTC).Add(14 * 24 * time.Hour)
 
 	// Create order parameters for buy order
-	params := services.CreateOrderObjectParams{
+	params := createOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
-		Side:                     OrderSideBuy,
-		Signer:                   suite.account.Sign,
+		Side:                     models.OrderSideBuy,
+		Type:                     models.OrderTypeLimit,
 		StarknetDomain:           suite.starknetDomain,
-		ExpireTime:               &expiryTime,
+		ExpireTime:               expiryTime,
 		PostOnly:                 false,
 		PreviousOrderExternalID:  nil,
 		OrderExternalID:          nil,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionClient,
-		Nonce:                    &suite.nonce,
+		TimeInForce:              models.TimeInForceGTT,
+		SelfTradeProtectionLevel: models.SelfTradeProtectionClient,
+		Nonce:                    suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
 
 	// Create the order
-	order, err := services.CreateOrderObject(params)
+	order, err := createOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -342,27 +344,27 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 	previousOrderID := "previous_custom_id"
 
 	// Create order parameters with previous order ID
-	params := services.CreateOrderObjectParams{
+	params := createOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
-		Side:                     OrderSideBuy,
-		Signer:                   suite.account.Sign,
+		Side:                     models.OrderSideBuy,
+		Type:                     models.OrderTypeLimit,
 		StarknetDomain:           suite.starknetDomain,
-		ExpireTime:               &expiryTime,
+		ExpireTime:               expiryTime,
 		PostOnly:                 false,
 		PreviousOrderExternalID:  &previousOrderID,
 		OrderExternalID:          nil,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionAccount,
-		Nonce:                    &suite.nonce,
+		TimeInForce:              models.TimeInForceGTT,
+		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
+		Nonce:                    suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
 
 	// Create the order
-	order, err := services.CreateOrderObject(params)
+	order, err := createOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -385,27 +387,27 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 	customOrderID := "custom_id"
 
 	// Create order parameters with custom order ID
-	params := services.CreateOrderObjectParams{
+	params := createOrderObjectParams{
 		Market:                   suite.market,
 		Account:                  suite.account,
 		SyntheticAmount:          decimal.RequireFromString("0.00100000"),
 		Price:                    decimal.RequireFromString("43445.11680000"),
-		Side:                     OrderSideBuy,
-		Signer:                   suite.account.Sign,
+		Side:                     models.OrderSideBuy,
+		Type:                     models.OrderTypeLimit,
 		StarknetDomain:           suite.starknetDomain,
-		ExpireTime:               &expiryTime,
+		ExpireTime:               expiryTime,
 		PostOnly:                 false,
 		PreviousOrderExternalID:  nil,
 		OrderExternalID:          &customOrderID,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionAccount,
-		Nonce:                    &suite.nonce,
+		TimeInForce:              models.TimeInForceGTT,
+		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
+		Nonce:                    suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
 
 	// Create the order
-	order, err := services.CreateOrderObject(params)
+	order, err := createOrderObject(params)
 	suite.Require().NoError(err)
 	suite.Require().NotNil(order)
 
@@ -426,3 +428,4 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 func TestOrdersTestSuite(t *testing.T) {
 	suite.Run(t, new(OrdersTestSuite))
 }
+

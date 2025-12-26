@@ -5,9 +5,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/extended-protocol/extended-sdk-golang/src/client"
 	"github.com/extended-protocol/extended-sdk-golang/src/models"
+	"github.com/shopspring/decimal"
 )
 
 // OrdersService provides order-related API operations.
@@ -15,8 +17,8 @@ type OrdersService struct {
 	Base *client.BaseClient
 }
 
-// SubmitOrder submits a perpetual order to the trading API
-func (s *OrdersService) SubmitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
+// submitOrder submits a perpetual order to the trading API
+func (s *OrdersService) submitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
 	// Validate order object is complete and properly signed
 	if order == nil {
 		return nil, fmt.Errorf("order is nil")
@@ -53,8 +55,91 @@ func (s *OrdersService) SubmitOrder(ctx context.Context, order *models.Perpetual
 	return &orderResponse, nil
 }
 
+// PlaceOrder creates an order object and submits it to the exchange.
+// Required parameters are passed as function arguments, optional parameters are passed as options.
+// It uses the account from the service's BaseClient and always uses account.Sign as the signer.
+//
+// Example usage:
+//
+//	order, err := client.Orders.PlaceOrder(ctx,
+//		market, amount, price, models.OrderSideBuy, models.OrderTypeLimit,
+//		models.TimeInForceGTT, models.SelfTradeProtectionAccount, nonce,
+//		services.WithPostOnly(true),
+//		services.WithReduceOnly(false),
+//		services.WithBuilderFee(builderFee),
+//	)
+func (s *OrdersService) PlaceOrder(
+	ctx context.Context,
+	market models.MarketModel,
+	syntheticAmount decimal.Decimal,
+	price decimal.Decimal,
+	side models.OrderSide,
+	orderType models.OrderType,
+	timeInForce models.TimeInForce,
+	selfTradeProtectionLevel models.SelfTradeProtectionLevel,
+	nonce int,
+	opts ...PlaceOrderOption,
+) (*models.OrderResponse, error) {
+	// Build config from options
+	config := buildPlaceOrderConfig(
+		market,
+		syntheticAmount,
+		price,
+		side,
+		orderType,
+		timeInForce,
+		selfTradeProtectionLevel,
+		nonce,
+		opts...,
+	)
+
+	// Get account and config from BaseClient
+	account, err := s.Base.StarkAccount()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stark account: %w", err)
+	}
+
+	endpointConfig := s.Base.EndpointConfig()
+
+	// Set default expire time if not provided (1 hour from now)
+	expireTime := config.ExpireTime
+	if expireTime == nil {
+		defaultExpire := time.Now().Add(1 * time.Hour)
+		expireTime = &defaultExpire
+	}
+
+	// Create order object
+	order, err := createOrderObject(createOrderObjectParams{
+		Market:                   config.Market,
+		Account:                  account,
+		SyntheticAmount:          config.SyntheticAmount,
+		Price:                    config.Price,
+		Side:                     config.Side,
+		Type:                     config.Type,
+		StarknetDomain:           endpointConfig.StarknetDomain,
+		ExpireTime:               *expireTime,
+		PostOnly:                 config.PostOnly,
+		ReduceOnly:               config.ReduceOnly,
+		PreviousOrderExternalID:  config.PreviousOrderExternalID,
+		OrderExternalID:          config.OrderExternalID,
+		TimeInForce:              config.TimeInForce,
+		SelfTradeProtectionLevel: config.SelfTradeProtectionLevel,
+		Nonce:                    config.Nonce,
+		BuilderFee:               config.BuilderFee,
+		BuilderID:                config.BuilderID,
+		TpSlType:                 config.TpSlType,
+		TakeProfit:               config.TakeProfit,
+		StopLoss:                 config.StopLoss,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create order object: %w", err)
+	}
+
+	// Submit the order
+	return s.submitOrder(ctx, order)
+}
+
 // Methods to be implemented:
-// - PlaceOrder (alias/wrapper for SubmitOrder)
 // - CancelOrder (new)
 // - CancelOrderByExternalID (new)
 // - MassCancel (new)

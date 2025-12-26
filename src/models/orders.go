@@ -199,3 +199,12 @@ type OpenOrderModel struct {
 	StopLoss                 *OpenOrderTpslTriggerModel `json:"stopLoss,omitempty"`
 }
 
+// TpSlTriggerParam represents parameters for a take profit or stop loss trigger
+// This matches the Python SDK's OrderTpslTriggerParam structure.
+type TpSlTriggerParam struct {
+	TriggerPrice     decimal.Decimal
+	TriggerPriceType TriggerPriceType
+	Price            decimal.Decimal
+	PriceType        ExecutionPriceType
+}
+

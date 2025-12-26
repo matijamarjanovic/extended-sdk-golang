@@ -124,7 +124,7 @@ func TestClient_GetMarketFee_NetworkError(t *testing.T) {
 	t.Logf("Got expected network error: %v", err)
 }
 
-func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
+func TestClient_PlaceOrder_ValidOrder(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
@@ -135,44 +135,27 @@ func TestClient_SubmitOrder_ValidOrder(t *testing.T) {
 
 	market := markets[0]
 
-	// Get account from client
-	account, err := client.StarkAccount()
-	require.NoError(t, err, "Should be able to get account")
-
 	// Create order parameters
 	nonce := int(time.Now().Unix()) // Use timestamp as nonce for uniqueness
 	expireTime := time.Now().Add(1 * time.Hour)
 
-	// Get config from client to use its StarknetDomain
-	cfg := client.EndpointConfig()
+	// Place the order using functional options pattern
+	response, err := client.Orders.PlaceOrder(ctx,
+		market,
+		decimal.NewFromFloat(0.001), // Small BTC amount
+		decimal.NewFromFloat(1),     // Place a low price so that it doesn't match
+		OrderSideBuy,
+		OrderTypeLimit,
+		TimeInForceGTT,
+		SelfTradeProtectionDisabled,
+		nonce,
+		WithExpireTime(expireTime),
+	)
 
-	params := services.CreateOrderObjectParams{
-		Market:          market,
-		Account:         account,
-		SyntheticAmount: decimal.NewFromFloat(0.001), // Small BTC amount
-		Price:           decimal.NewFromFloat(1),     // Place a low price so that it doesn't match
-		Side:            OrderSideBuy,
-		Signer:          account.Sign,
-		StarknetDomain:  cfg.StarknetDomain,
-		ExpireTime:               &expireTime,
-		PostOnly:                 false,
-		TimeInForce:              TimeInForceGTT,
-		SelfTradeProtectionLevel: SelfTradeProtectionDisabled,
-		Nonce:                    &nonce,
-	}
-
-	// Create the order object
-	order, err := services.CreateOrderObject(params)
-	require.NoError(t, err, "Should be able to create valid order")
-	require.NotNil(t, order, "Order should not be nil")
-
-	// Submit the order
-	response, err := client.Orders.SubmitOrder(ctx, order)
-
-	require.NoError(t, err, "Should not error when submitting valid order")
+	require.NoError(t, err, "Should not error when placing valid order")
 
 	require.NotNil(t, response, "Response should not be nil")
 	require.Equal(t, "OK", response.Status, "Response status should be OK")
 
-	t.Logf("Successfully submitted order with ID: %s", response.Data.ExternalID)
+	t.Logf("Successfully placed order with ID: %s", response.Data.ExternalID)
 }

@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"math/big"
 	"time"
 
 	"github.com/extended-protocol/extended-sdk-golang/src/client"
@@ -10,48 +9,67 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// CreateOrderObjectParams represents the parameters for creating an order object
-type CreateOrderObjectParams struct {
+
+// createOrderObjectParams represents the parameters for creating an order object
+// All fields are required. For optional fields, pass nil or empty string.
+type createOrderObjectParams struct {
 	Market                   models.MarketModel
 	Account                  *client.StarkPerpetualAccount
 	SyntheticAmount          decimal.Decimal
 	Price                    decimal.Decimal
 	Side                     models.OrderSide
-	Signer                   func(string) (*big.Int, *big.Int, error) // Function that takes string and returns two values
+	Type                     models.OrderType
 	StarknetDomain           models.StarknetDomain
-	ExpireTime               *time.Time
+	ExpireTime               time.Time
 	PostOnly                 bool
-	PreviousOrderExternalID  *string
-	OrderExternalID          *string
+	ReduceOnly               bool
+	PreviousOrderExternalID  *string // Optional: pass nil if not canceling a previous order
+	OrderExternalID          *string // Optional: pass nil to use order hash as ID
 	TimeInForce              models.TimeInForce
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
-	Nonce                    *int
-	BuilderFee               *decimal.Decimal
-	BuilderID                *int
+	Nonce                    int
+	BuilderFee               *decimal.Decimal // Optional: pass nil if no builder fee
+	BuilderID                *int             // Optional: pass nil if no builder ID
+	TpSlType                 *models.TpSlType        // Optional: TPSL type (ORDER or POSITION)
+	TakeProfit               *models.TpSlTriggerParam // Optional: take profit trigger parameters
+	StopLoss                 *models.TpSlTriggerParam // Optional: stop loss trigger parameters
 }
 
-// CreateOrderObject creates a PerpetualOrderModel with the given parameters
-func CreateOrderObject(params CreateOrderObjectParams) (*models.PerpetualOrderModel, error) {
+// createOrderObject creates a PerpetualOrderModel with the given parameters
+func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderModel, error) {
+	// Validate side (must be BUY or SELL)
+	if params.Side != models.OrderSideBuy && params.Side != models.OrderSideSell {
+		return nil, fmt.Errorf("unexpected order side value: %s", params.Side)
+	}
+
+	// Validate time_in_force (must be GTT or IOC, not FOK)
+	if params.TimeInForce == models.TimeInForceFOK {
+		return nil, fmt.Errorf("unexpected time in force value: FOK is not supported")
+	}
+	if params.TimeInForce != models.TimeInForceGTT && params.TimeInForce != models.TimeInForceIOC {
+		return nil, fmt.Errorf("unexpected time in force value: %s", params.TimeInForce)
+	}
+
+	// Validate expire_time is not zero
+	if params.ExpireTime.IsZero() {
+		return nil, fmt.Errorf("expire_time must be provided")
+	}
+
 	market := params.Market
-
-	if params.ExpireTime == nil {
-		cur := time.Now().Add(1 * time.Hour)
-		params.ExpireTime = &cur
-	}
-
-	// Error if nonce is nil, we keep the input as a pointer so that
-	// it is the same as the input to the function
-	if params.Nonce == nil {
-		return nil, fmt.Errorf("nonce must be provided")
-	}
 
 	// If we are buying, then we round up, otherwise we round down
 	is_buying_synthetic := params.Side == models.OrderSideBuy
 	collateral_amount := params.SyntheticAmount.Mul(params.Price)
 
-	// For now we only use the default fee type
-	// TODO: Allow users to add different fee types
-	fees := models.DefaultFees
+	// Get trading fees for the market. First check account's trading_fee cache,
+	// then fall back to DefaultFees if not found.
+	// Note: Fees are determined by the platform via GET /api/v1/user/fees?market={market}
+	// and cannot be set by users. The team reserves the right to update the fee schedule. Currently:
+	// - Taker: 0.025% (0.0005 in decimal)
+	// - Maker: 0.000% (0.0000 in decimal)
+	// To cache platform-determined fees, call AccountService.GetMarketFee() or AccountService.GetFees()
+	// and then update the account's fee cache using account.SetTradingFee().
+	fees := params.Account.GetTradingFee(params.Market.Name)
 
 	total_fee := fees.TakerFeeRate
 	if params.BuilderFee != nil {
@@ -88,9 +106,9 @@ func CreateOrderObject(params CreateOrderObjectParams) (*models.PerpetualOrderMo
 		AmountCollateral:    stark_collateral_amount,
 		CollateralAssetID:   market.L2Config.CollateralID,
 		MaxFee:              stark_fee_part,
-		Nonce:               *params.Nonce,
+		Nonce:               params.Nonce,
 		PositionID:          int(params.Account.Vault()),
-		ExpirationTimestamp: *params.ExpireTime,
+		ExpirationTimestamp: params.ExpireTime,
 		PublicKey:           params.Account.PublicKey(),
 		StarknetDomain:      params.StarknetDomain,
 	})
@@ -99,7 +117,7 @@ func CreateOrderObject(params CreateOrderObjectParams) (*models.PerpetualOrderMo
 		return nil, fmt.Errorf("hashing order failed: %w", err)
 	}
 
-	sig_r, sig_s, err := params.Signer(order_hash)
+	sig_r, sig_s, err := params.Account.Sign(order_hash)
 	if err != nil {
 		return nil, fmt.Errorf("signer function failed: %w", err)
 	}
@@ -127,23 +145,34 @@ func CreateOrderObject(params CreateOrderObjectParams) (*models.PerpetualOrderMo
 	// Convert expire time to epoch milliseconds
 	expiryEpochMillis := params.ExpireTime.UnixNano() / int64(time.Millisecond)
 
+	// Use order hash as ID if OrderExternalID is not provided
+	orderID := order_hash
+	if params.OrderExternalID != nil {
+		orderID = *params.OrderExternalID
+	}
+
 	order := &models.PerpetualOrderModel{
-		ID:                       *params.OrderExternalID,
+		ID:                       orderID,
 		Market:                   params.Market.Name,
-		Type:                     models.OrderTypeLimit,
+		Type:                     params.Type,
 		Side:                     params.Side,
 		Qty:                      params.SyntheticAmount.String(),
 		Price:                    params.Price.String(),
 		PostOnly:                 params.PostOnly,
+		ReduceOnly:               params.ReduceOnly,
 		TimeInForce:              params.TimeInForce,
 		ExpiryEpochMillis:        expiryEpochMillis,
 		Fee:                      fees.TakerFeeRate.String(),
 		SelfTradeProtectionLevel: params.SelfTradeProtectionLevel,
-		Nonce:                    fmt.Sprintf("%d", *params.Nonce),
+		Nonce:                    fmt.Sprintf("%d", params.Nonce),
 		CancelID:                 params.PreviousOrderExternalID,
 		Settlement:               settlement,
 		BuilderFee:               fee_builder_str,
-		BuilderID:                  params.BuilderID,
+		BuilderID:                params.BuilderID,
+		// TPSL fields are set to nil for now - full implementation would require settlement data with opposite side
+		TpSlType:   params.TpSlType,
+		TakeProfit: nil,
+		StopLoss:   nil,
 	}
 
 	return order, nil
@@ -164,12 +193,12 @@ type HashOrderParams struct {
 }
 
 // HashOrder computes the order hash using the provided parameters.
-// This mimics the Python hash_order function
+// This function remains exported in case someone needs/wants to make their own implementation of the SDK but
+// doesn't want to go through the trouble of implementing the hashing.
+// It follows the same logic as the Python SDK, adding a 14 day buffer to the expiration timestamp.
 func HashOrder(params HashOrderParams) (string, error) {
-	// Add 14 days buffer to expiration timestamp
 	expireTimeWithBuffer := params.ExpirationTimestamp.Add(14 * 24 * time.Hour)
 
-	// Round UP to the nearest second
 	expireTimeRounded := expireTimeWithBuffer.Truncate(time.Second)
 	if expireTimeWithBuffer.After(expireTimeRounded) {
 		expireTimeRounded = expireTimeRounded.Add(time.Second)
@@ -177,7 +206,6 @@ func HashOrder(params HashOrderParams) (string, error) {
 
 	expireTimeAsSeconds := expireTimeRounded.Unix()
 
-	// Call GetOrderHash from client package
 	hash, err := client.GetOrderHash(
 		fmt.Sprintf("%d", params.PositionID),       // position_id
 		params.SyntheticAssetID,                    // base_asset_id_hex
