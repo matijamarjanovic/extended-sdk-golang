@@ -17,9 +17,9 @@ type PlaceOrderConfig struct {
 	Type                     models.OrderType
 	TimeInForce              models.TimeInForce
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
-	Nonce                    int
 
 	// Optional fields with defaults
+	Nonce                    *int // nil means auto-generate
 	PostOnly                bool
 	ReduceOnly              bool
 	ExpireTime              *time.Time // nil means default (1 hour from now)
@@ -102,6 +102,13 @@ func WithStopLoss(trigger models.TpSlTriggerParam) PlaceOrderOption {
 	}
 }
 
+// WithNonce sets a custom nonce for the order. If not provided, nonce will be auto-generated.
+func WithNonce(nonce int) PlaceOrderOption {
+	return func(c *PlaceOrderConfig) {
+		c.Nonce = &nonce
+	}
+}
+
 // buildPlaceOrderConfig builds a PlaceOrderConfig from required parameters and options.
 func buildPlaceOrderConfig(
 	market models.MarketModel,
@@ -111,7 +118,6 @@ func buildPlaceOrderConfig(
 	orderType models.OrderType,
 	timeInForce models.TimeInForce,
 	selfTradeProtectionLevel models.SelfTradeProtectionLevel,
-	nonce int,
 	opts ...PlaceOrderOption,
 ) *PlaceOrderConfig {
 	// Initialize config with required parameters
@@ -123,10 +129,10 @@ func buildPlaceOrderConfig(
 		Type:                     orderType,
 		TimeInForce:              timeInForce,
 		SelfTradeProtectionLevel: selfTradeProtectionLevel,
-		Nonce:                    nonce,
 		// Defaults
 		PostOnly:   false,
 		ReduceOnly: false,
+		Nonce:      nil, // Auto-generate if not provided via option
 	}
 
 	// Apply options

@@ -1,7 +1,9 @@
 package services
 
 import (
+	"crypto/rand"
 	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/extended-protocol/extended-sdk-golang/src/client"
@@ -27,7 +29,7 @@ type createOrderObjectParams struct {
 	OrderExternalID          *string // Optional: pass nil to use order hash as ID
 	TimeInForce              models.TimeInForce
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
-	Nonce                    int
+	Nonce                    *int // Optional: pass nil to auto-generate
 	BuilderFee               *decimal.Decimal // Optional: pass nil if no builder fee
 	BuilderID                *int             // Optional: pass nil if no builder ID
 	TpSlType                 *models.TpSlType        // Optional: TPSL type (ORDER or POSITION)
@@ -53,6 +55,19 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 	// Validate expire_time is not zero
 	if params.ExpireTime.IsZero() {
 		return nil, fmt.Errorf("expire_time must be provided")
+	}
+
+	// Auto-generate nonce if not provided (matching Python SDK behavior)
+	nonce := params.Nonce
+	if nonce == nil {
+		// Generate random nonce in range [0, 2^32 - 1] matching Python SDK's random.randint(0, 2**32 - 1)
+		maxNonce := big.NewInt(1<<32 - 1)
+		generatedNonce, err := rand.Int(rand.Reader, maxNonce)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate nonce: %w", err)
+		}
+		nonceValue := int(generatedNonce.Int64())
+		nonce = &nonceValue
 	}
 
 	market := params.Market
@@ -106,7 +121,7 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 		AmountCollateral:    stark_collateral_amount,
 		CollateralAssetID:   market.L2Config.CollateralID,
 		MaxFee:              stark_fee_part,
-		Nonce:               params.Nonce,
+		Nonce:               *nonce,
 		PositionID:          int(params.Account.Vault()),
 		ExpirationTimestamp: params.ExpireTime,
 		PublicKey:           params.Account.PublicKey(),
@@ -164,7 +179,7 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 		ExpiryEpochMillis:        expiryEpochMillis,
 		Fee:                      fees.TakerFeeRate.String(),
 		SelfTradeProtectionLevel: params.SelfTradeProtectionLevel,
-		Nonce:                    fmt.Sprintf("%d", params.Nonce),
+		Nonce:                    fmt.Sprintf("%d", *nonce),
 		CancelID:                 params.PreviousOrderExternalID,
 		Settlement:               settlement,
 		BuilderFee:               fee_builder_str,

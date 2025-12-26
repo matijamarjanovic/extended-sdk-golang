@@ -20,15 +20,17 @@ type OrdersService struct {
 // PlaceOrder creates an order object and submits it to the exchange.
 // Required parameters are passed as function arguments, optional parameters are passed as options.
 // It uses the account from the service's BaseClient and always uses account.Sign as the signer.
+// If nonce is not provided via WithNonce option, it will be auto-generated.
 //
 // Example usage:
 //
 //	order, err := client.Orders.PlaceOrder(ctx,
 //		market, amount, price, models.OrderSideBuy, models.OrderTypeLimit,
-//		models.TimeInForceGTT, models.SelfTradeProtectionAccount, nonce,
-//		services.WithPostOnly(true),
-//		services.WithReduceOnly(false),
-//		services.WithBuilderFee(builderFee),
+//		models.TimeInForceGTT, models.SelfTradeProtectionAccount,
+//		sdk.WithPostOnly(true),
+//		sdk.WithReduceOnly(false),
+//		sdk.WithBuilderFee(builderFee),
+//		sdk.WithNonce(customNonce), // Optional: omit to auto-generate
 //	)
 func (s *OrdersService) PlaceOrder(
 	ctx context.Context,
@@ -39,7 +41,6 @@ func (s *OrdersService) PlaceOrder(
 	orderType models.OrderType,
 	timeInForce models.TimeInForce,
 	selfTradeProtectionLevel models.SelfTradeProtectionLevel,
-	nonce int,
 	opts ...PlaceOrderOption,
 ) (*models.OrderResponse, error) {
 	// Build config from options
@@ -51,7 +52,6 @@ func (s *OrdersService) PlaceOrder(
 		orderType,
 		timeInForce,
 		selfTradeProtectionLevel,
-		nonce,
 		opts...,
 	)
 

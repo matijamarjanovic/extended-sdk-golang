@@ -53,3 +53,7 @@ func WithTakeProfit(trigger models.TpSlTriggerParam) PlaceOrderOption {
 func WithStopLoss(trigger models.TpSlTriggerParam) PlaceOrderOption {
 	return services.WithStopLoss(trigger)
 }
+
+func WithNonce(nonce int) PlaceOrderOption {
+	return services.WithNonce(nonce)
+}

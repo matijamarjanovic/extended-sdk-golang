@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/services"
+	"github.com/extended-protocol/extended-sdk-golang/src/models"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -136,19 +136,17 @@ func TestClient_PlaceOrder_ValidOrder(t *testing.T) {
 	market := markets[0]
 
 	// Create order parameters
-	nonce := int(time.Now().Unix()) // Use timestamp as nonce for uniqueness
 	expireTime := time.Now().Add(1 * time.Hour)
 
-	// Place the order using functional options pattern
+	// Place the order using functional options pattern (nonce will be auto-generated)
 	response, err := client.Orders.PlaceOrder(ctx,
 		market,
 		decimal.NewFromFloat(0.001), // Small BTC amount
 		decimal.NewFromFloat(1),     // Place a low price so that it doesn't match
 		OrderSideBuy,
-		OrderTypeLimit,
+		models.OrderTypeLimit,
 		TimeInForceGTT,
 		SelfTradeProtectionDisabled,
-		nonce,
 		WithExpireTime(expireTime),
 	)
 
