@@ -95,7 +95,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrderWithDefaultExpiration() {
 		OrderExternalID:          nil,
 		TimeInForce:              models.TimeInForceGTT,
 		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
-		Nonce:                    suite.nonce,
+		Nonce:                    &suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
@@ -180,7 +180,7 @@ func (suite *OrdersTestSuite) TestCreateSellOrder() {
 		OrderExternalID:          nil,
 		TimeInForce:              models.TimeInForceGTT,
 		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
-		Nonce:                    suite.nonce,
+		Nonce:                    &suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
@@ -277,7 +277,7 @@ func (suite *OrdersTestSuite) TestCreateBuyOrderWithClientProtection() {
 		OrderExternalID:          nil,
 		TimeInForce:              models.TimeInForceGTT,
 		SelfTradeProtectionLevel: models.SelfTradeProtectionClient,
-		Nonce:                    suite.nonce,
+		Nonce:                    &suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
@@ -358,7 +358,7 @@ func (suite *OrdersTestSuite) TestCancelPreviousOrder() {
 		OrderExternalID:          nil,
 		TimeInForce:              models.TimeInForceGTT,
 		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
-		Nonce:                    suite.nonce,
+		Nonce:                    &suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}
@@ -401,7 +401,7 @@ func (suite *OrdersTestSuite) TestExternalOrderID() {
 		OrderExternalID:          &customOrderID,
 		TimeInForce:              models.TimeInForceGTT,
 		SelfTradeProtectionLevel: models.SelfTradeProtectionAccount,
-		Nonce:                    suite.nonce,
+		Nonce:                    &suite.nonce,
 		BuilderFee:               nil,
 		BuilderID:                nil,
 	}

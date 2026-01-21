@@ -314,10 +314,9 @@ func TestAccountService_GetBridgeQuote(t *testing.T) {
 		return
 	}
 
-	// Use STRK as chainIn and the first available chain as chainOut
-	chainIn := "STRK"
-	chainOut := config.Chains[0].Chain
-	amount := decimal.NewFromFloat(1.0) // 1.0 amount for testing
+	chainIn := config.Chains[0].Chain
+	chainOut := "STRK"
+	amount := decimal.NewFromFloat(1.0)
 
 	quote, err := client.Account.GetBridgeQuote(ctx, chainIn, chainOut, amount)
 
