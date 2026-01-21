@@ -10,12 +10,13 @@ import (
 
 // Client provides REST API functionality for perpetual trading.
 // It embeds BaseClient to reuse common functionality like HTTP client, auth, etc.
-// It provides access to domain-specific services through the Account, Orders, and Markets fields.
+// It provides access to domain-specific services through the Account, Orders, Markets, and Streaming fields.
 type Client struct {
 	*client.BaseClient
-	Account *services.AccountService
-	Orders  *services.OrdersService
-	Markets *services.MarketsService
+	Account   *services.AccountService
+	Orders    *services.OrdersService
+	Markets   *services.MarketsService
+	Streaming *services.StreamingService
 }
 
 // NewClient creates a new Client instance with all services initialized.
@@ -34,6 +35,7 @@ func NewClient(
 	sdkClient.Account = &services.AccountService{Base: baseClient}
 	sdkClient.Orders = &services.OrdersService{Base: baseClient}
 	sdkClient.Markets = &services.MarketsService{Base: baseClient}
+	sdkClient.Streaming = &services.StreamingService{Base: baseClient}
 
 	return sdkClient
 }
