@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10/client"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
 	"github.com/joho/godotenv"
 )
 
@@ -36,11 +36,7 @@ func createTestClient() *Client {
 	publicKey := os.Getenv("TEST_PUBLIC_KEY")
 	privateKey := os.Getenv("TEST_PRIVATE_KEY")
 
-	account, err := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
-
-	if err != nil {
-		panic("failed to create StarkPerpetualAccount: " + err.Error())
-	}
+	account := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
 
 	return NewClient(STARKNET_MAINNET_CONFIG, account, 30*time.Second)
 }
@@ -56,7 +52,6 @@ type StarknetDomain = models.StarknetDomain
 type StarkPerpetualAccount = client.StarkPerpetualAccount
 
 // Function aliases for client package functions
-var NewStarkPerpetualAccount = client.NewStarkPerpetualAccount
 var GetOrderHash = client.GetOrderHash
 var SignMessage = client.SignMessage
 

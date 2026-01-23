@@ -3,7 +3,7 @@ package services
 import (
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
 	"github.com/shopspring/decimal"
 )
 

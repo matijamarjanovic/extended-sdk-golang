@@ -1,4 +1,4 @@
-module github.com/extended-protocol/extended-sdk-golang
+module github.com/matijamarjanovic/extended-sdk-golang
 
 go 1.19
 

@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10/client"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
 )
 
 // MarketsService provides market-related API operations.

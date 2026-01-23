@@ -1,6 +1,6 @@
 package sdk
 
-import "github.com/extended-protocol/extended-sdk-golang/x10/client"
+import "github.com/matijamarjanovic/extended-sdk-golang/x10/client"
 
 // NewStarkPerpetualAccount creates a new Stark perpetual trading account.
 // It wraps client.NewStarkPerpetualAccount to provide a root-level API.

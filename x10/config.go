@@ -1,6 +1,6 @@
 package sdk
 
-import "github.com/extended-protocol/extended-sdk-golang/x10/models"
+import "github.com/matijamarjanovic/extended-sdk-golang/x10/models"
 
 // STARKNET_TESTNET_CONFIG is the pre-configured endpoint configuration for Starknet testnet
 var STARKNET_TESTNET_CONFIG = models.EndpointConfig{
