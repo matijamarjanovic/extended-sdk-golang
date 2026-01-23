@@ -64,7 +64,7 @@ func TestStreamingService_buildStreamURL(t *testing.T) {
 	}
 }
 
-// Integration tests - these connect to real WebSocket endpoints
+// integration tests - these connect to real WebSocket endpoints
 func createRealStreamingService() *StreamingService {
 	cfg := models.EndpointConfig{
 		StreamURL: "wss://api.starknet.sepolia.extended.exchange/stream.extended.exchange/v1",
@@ -79,20 +79,17 @@ func TestStreamingService_SubscribeToOrderbooks_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Subscribe to orderbook for BTC-USD
 	conn, err := service.SubscribeToOrderbooks(ctx, "BTC-USD", nil)
-	require.NoError(t, err, "Should successfully connect to orderbook stream")
+	require.NoError(t, err, "should successfully connect to orderbook stream")
 	defer conn.Close()
 
-	// Try to receive at least one message
 	var orderbook models.OrderbookUpdateModel
 	err = conn.Recv(ctx, &orderbook)
-	require.NoError(t, err, "Should receive at least one orderbook message")
+	require.NoError(t, err, "should receive at least one orderbook message")
 
-	// Verify we got valid data
-	assert.NotEmpty(t, orderbook.Market, "Market should be set")
-	assert.Greater(t, conn.MessagesCount(), int64(0), "Should have received at least one message")
-	t.Logf("Received orderbook update for market: %s", orderbook.Market)
+	assert.NotEmpty(t, orderbook.Market, "market should be set")
+	assert.Greater(t, conn.MessagesCount(), int64(0), "should have received at least one message")
+	t.Logf("received orderbook update for market: %s", orderbook.Market)
 }
 
 func TestStreamingService_SubscribeToMarkPrices_RealConnection(t *testing.T) {
@@ -101,21 +98,18 @@ func TestStreamingService_SubscribeToMarkPrices_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Subscribe to mark prices for BTC-USD
 	conn, err := service.SubscribeToMarkPrices(ctx, "BTC-USD")
-	require.NoError(t, err, "Should successfully connect to mark price stream")
+	require.NoError(t, err, "should successfully connect to mark price stream")
 	defer conn.Close()
 
-	// Try to receive at least one message
 	var markPrice models.MarkPriceModel
 	err = conn.Recv(ctx, &markPrice)
-	require.NoError(t, err, "Should receive at least one mark price message")
+	require.NoError(t, err, "should receive at least one mark price message")
 
-	// Verify we got valid data
-	assert.NotEmpty(t, markPrice.Market, "Market should be set")
-	assert.True(t, markPrice.Price.GreaterThan(decimal.Zero), "Price should be positive")
-	assert.Greater(t, conn.MessagesCount(), int64(0), "Should have received at least one message")
-	t.Logf("Received mark price for %s: %s", markPrice.Market, markPrice.Price.String())
+	assert.NotEmpty(t, markPrice.Market, "market should be set")
+	assert.True(t, markPrice.Price.GreaterThan(decimal.Zero), "price should be positive")
+	assert.Greater(t, conn.MessagesCount(), int64(0), "should have received at least one message")
+	t.Logf("received mark price for %s: %s", markPrice.Market, markPrice.Price.String())
 }
 
 func TestStreamingService_SubscribeToIndexPrices_RealConnection(t *testing.T) {
@@ -124,21 +118,18 @@ func TestStreamingService_SubscribeToIndexPrices_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Subscribe to index prices for BTC-USD
 	conn, err := service.SubscribeToIndexPrices(ctx, "BTC-USD")
-	require.NoError(t, err, "Should successfully connect to index price stream")
+	require.NoError(t, err, "should successfully connect to index price stream")
 	defer conn.Close()
 
-	// Try to receive at least one message
 	var indexPrice models.IndexPriceModel
 	err = conn.Recv(ctx, &indexPrice)
-	require.NoError(t, err, "Should receive at least one index price message")
+	require.NoError(t, err, "should receive at least one index price message")
 
-	// Verify we got valid data
-	assert.NotEmpty(t, indexPrice.Market, "Market should be set")
-	assert.True(t, indexPrice.Price.GreaterThan(decimal.Zero), "Price should be positive")
-	assert.Greater(t, conn.MessagesCount(), int64(0), "Should have received at least one message")
-	t.Logf("Received index price for %s: %s", indexPrice.Market, indexPrice.Price.String())
+	assert.NotEmpty(t, indexPrice.Market, "market should be set")
+	assert.True(t, indexPrice.Price.GreaterThan(decimal.Zero), "price should be positive")
+	assert.Greater(t, conn.MessagesCount(), int64(0), "should have received at least one message")
+	t.Logf("received index price for %s: %s", indexPrice.Market, indexPrice.Price.String())
 }
 
 func TestStreamingService_SubscribeToPublicTrades_RealConnection(t *testing.T) {
@@ -147,31 +138,26 @@ func TestStreamingService_SubscribeToPublicTrades_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Subscribe to public trades for BTC-USD
 	conn, err := service.SubscribeToPublicTrades(ctx, "BTC-USD")
-	require.NoError(t, err, "Should successfully connect to public trades stream")
+	require.NoError(t, err, "should successfully connect to public trades stream")
 	defer conn.Close()
 
-	// Try to receive at least one message (may timeout if no trades occur)
-	// Public trades stream returns an array of trades
 	var trades []models.StreamPublicTradeModel
 	err = conn.Recv(ctx, &trades)
 	if err != nil {
-		// If we timeout, that's okay - just verify connection was established
 		if ctx.Err() == context.DeadlineExceeded {
-			t.Log("No trades received within timeout, but connection was successful")
+			t.Log("no trades received within timeout, but connection was successful")
 			return
 		}
-		require.NoError(t, err, "Should receive trades or timeout gracefully")
+		require.NoError(t, err, "should receive trades or timeout gracefully")
 	}
 
-	// If we got trades, verify them
 	if err == nil {
-		require.Greater(t, len(trades), 0, "Should receive at least one trade")
+		require.Greater(t, len(trades), 0, "should receive at least one trade")
 		trade := trades[0]
-		assert.NotEmpty(t, trade.Market, "Market should be set")
-		assert.True(t, trade.Price.GreaterThan(decimal.Zero), "Price should be positive")
-		t.Logf("Received %d trades, first trade for %s: %s @ %s", len(trades), trade.Market, trade.Qty.String(), trade.Price.String())
+		assert.NotEmpty(t, trade.Market, "market should be set")
+		assert.True(t, trade.Price.GreaterThan(decimal.Zero), "price should be positive")
+		t.Logf("received %d trades, first trade for %s: %s @ %s", len(trades), trade.Market, trade.Qty.String(), trade.Price.String())
 	}
 }
 
@@ -181,27 +167,23 @@ func TestStreamingService_SubscribeToFundingRates_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Subscribe to funding rates for BTC-USD
 	conn, err := service.SubscribeToFundingRates(ctx, "BTC-USD")
-	require.NoError(t, err, "Should successfully connect to funding rates stream")
+	require.NoError(t, err, "should successfully connect to funding rates stream")
 	defer conn.Close()
 
-	// Try to receive at least one message (may timeout if no updates occur)
 	var fundingRate models.FundingRateModel
 	err = conn.Recv(ctx, &fundingRate)
 	if err != nil {
-		// If we timeout, that's okay - just verify connection was established
 		if ctx.Err() == context.DeadlineExceeded {
-			t.Log("No funding rate updates received within timeout, but connection was successful")
+			t.Log("no funding rate updates received within timeout, but connection was successful")
 			return
 		}
-		require.NoError(t, err, "Should receive funding rate or timeout gracefully")
+		require.NoError(t, err, "should receive funding rate or timeout gracefully")
 	}
 
-	// If we got a funding rate, verify it
 	if err == nil {
-		assert.NotEmpty(t, fundingRate.Market, "Market should be set")
-		t.Logf("Received funding rate for %s: %s", fundingRate.Market, fundingRate.FundingRate.String())
+		assert.NotEmpty(t, fundingRate.Market, "market should be set")
+		t.Logf("received funding rate for %s: %s", fundingRate.Market, fundingRate.FundingRate.String())
 	}
 }
 
@@ -214,19 +196,15 @@ func TestStreamingService_ConnectionClose(t *testing.T) {
 	conn, err := service.SubscribeToMarkPrices(ctx, "BTC-USD")
 	require.NoError(t, err)
 
-	// Verify connection is open
-	assert.False(t, conn.IsClosed(), "Connection should be open")
+	assert.False(t, conn.IsClosed(), "connection should be open")
 
-	// Close the connection
 	err = conn.Close()
-	require.NoError(t, err, "Should close connection successfully")
+	require.NoError(t, err, "should close connection successfully")
 
-	// Verify connection is closed
-	assert.True(t, conn.IsClosed(), "Connection should be closed")
+	assert.True(t, conn.IsClosed(), "connection should be closed")
 
-	// Try to receive after close should fail
 	var markPrice models.MarkPriceModel
 	err = conn.Recv(ctx, &markPrice)
-	assert.Error(t, err, "Should error when trying to receive on closed connection")
-	assert.Contains(t, err.Error(), "closed", "Error should mention connection is closed")
+	assert.Error(t, err, "should error when trying to receive on closed connection")
+	assert.Contains(t, err.Error(), "closed", "error should mention connection is closed")
 }

@@ -25,26 +25,24 @@ type createOrderObjectParams struct {
 	ExpireTime               time.Time
 	PostOnly                 bool
 	ReduceOnly               bool
-	PreviousOrderExternalID  *string // Optional: pass nil if not canceling a previous order
-	OrderExternalID          *string // Optional: pass nil to use order hash as ID
+	PreviousOrderExternalID  *string // optional: pass nil if not canceling a previous order
+	OrderExternalID          *string // optional: pass nil to use order hash as ID
 	TimeInForce              models.TimeInForce
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
-	Nonce                    *int // Optional: pass nil to auto-generate
-	BuilderFee               *decimal.Decimal // Optional: pass nil if no builder fee
-	BuilderID                *int             // Optional: pass nil if no builder ID
-	TpSlType                 *models.TpSlType        // Optional: TPSL type (ORDER or POSITION)
-	TakeProfit               *models.TpSlTriggerParam // Optional: take profit trigger parameters
-	StopLoss                 *models.TpSlTriggerParam // Optional: stop loss trigger parameters
+	Nonce                    *int // optional: pass nil to auto-generate
+	BuilderFee               *decimal.Decimal // optional: pass nil if no builder fee
+	BuilderID                *int             // optional: pass nil if no builder ID
+	TpSlType                 *models.TpSlType        // optional: TPSL type (ORDER or POSITION)
+	TakeProfit               *models.TpSlTriggerParam // optional: take profit trigger parameters
+	StopLoss                 *models.TpSlTriggerParam // optional: stop loss trigger parameters
 }
 
 // createOrderObject creates a PerpetualOrderModel with the given parameters
 func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderModel, error) {
-	// Validate side (must be BUY or SELL)
 	if params.Side != models.OrderSideBuy && params.Side != models.OrderSideSell {
 		return nil, fmt.Errorf("unexpected order side value: %s", params.Side)
 	}
 
-	// Validate time_in_force (must be GTT or IOC, not FOK)
 	if params.TimeInForce == models.TimeInForceFOK {
 		return nil, fmt.Errorf("unexpected time in force value: FOK is not supported")
 	}
@@ -52,15 +50,14 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 		return nil, fmt.Errorf("unexpected time in force value: %s", params.TimeInForce)
 	}
 
-	// Validate expire_time is not zero
 	if params.ExpireTime.IsZero() {
 		return nil, fmt.Errorf("expire_time must be provided")
 	}
 
-	// Auto-generate nonce if not provided (matching Python SDK behavior)
+	// auto-generate nonce if not provided
 	nonce := params.Nonce
 	if nonce == nil {
-		// Generate random nonce in range [0, 2^32 - 1] matching Python SDK's random.randint(0, 2**32 - 1)
+		// generate random nonce in range [0, 2^32 - 1]
 		maxNonce := big.NewInt(1<<32 - 1)
 		generatedNonce, err := rand.Int(rand.Reader, maxNonce)
 		if err != nil {
@@ -72,18 +69,13 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 
 	market := params.Market
 
-	// If we are buying, then we round up, otherwise we round down
+	// if we are buying, then we round up, otherwise we round down
 	is_buying_synthetic := params.Side == models.OrderSideBuy
 	collateral_amount := params.SyntheticAmount.Mul(params.Price)
 
-	// Get trading fees for the market. First check account's trading_fee cache,
+	// get trading fees for the market. First check account's trading_fee cache,
 	// then fall back to DefaultFees if not found.
-	// Note: Fees are determined by the platform via GET /api/v1/user/fees?market={market}
-	// and cannot be set by users. The team reserves the right to update the fee schedule. Currently:
-	// - Taker: 0.025% (0.0005 in decimal)
-	// - Maker: 0.000% (0.0000 in decimal)
-	// To cache platform-determined fees, call AccountService.GetMarketFee() or AccountService.GetFees()
-	// and then update the account's fee cache using account.SetTradingFee().
+	// https://api.docs.extended.exchange/#get-fees
 	fees := params.Account.GetTradingFee(params.Market.Name)
 
 	total_fee := fees.TakerFeeRate
@@ -96,7 +88,7 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 	stark_collateral_amount_dec := collateral_amount.Mul(decimal.NewFromInt(market.L2Config.CollateralResolution))
 	stark_synthetic_amount_dec := params.SyntheticAmount.Mul(decimal.NewFromInt(market.L2Config.SyntheticResolution))
 
-	// Round accordingly
+	// round accordingly
 	if is_buying_synthetic {
 		stark_collateral_amount_dec = stark_collateral_amount_dec.Ceil()
 		stark_synthetic_amount_dec = stark_synthetic_amount_dec.Ceil()
@@ -157,10 +149,10 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 		fee_builder_str = &builderFeeStr
 	}
 
-	// Convert expire time to epoch milliseconds
+	// convert expire time to epoch milliseconds
 	expiryEpochMillis := params.ExpireTime.UnixNano() / int64(time.Millisecond)
 
-	// Use order hash as ID if OrderExternalID is not provided
+	// use order hash as ID if OrderExternalID is not provided
 	orderID := order_hash
 	if params.OrderExternalID != nil {
 		orderID = *params.OrderExternalID
@@ -184,21 +176,135 @@ func createOrderObject(params createOrderObjectParams) (*models.PerpetualOrderMo
 		Settlement:               settlement,
 		BuilderFee:               fee_builder_str,
 		BuilderID:                params.BuilderID,
-		// TPSL fields are set to nil for now - full implementation would require settlement data with opposite side
-		TpSlType:   params.TpSlType,
-		TakeProfit: nil,
-		StopLoss:   nil,
+		TpSlType:                 params.TpSlType,
+	}
+
+	// create TPSL triggers - if requested, they must succeed or the entire order creation fails
+	// use the resolved nonce (same as main order) for TPSL triggers
+	if params.TakeProfit != nil {
+		takeProfit, err := createTpSlTrigger(params.TakeProfit, params, market, fees, *nonce)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create take profit trigger: %w", err)
+		}
+		order.TakeProfit = takeProfit
+	}
+
+	if params.StopLoss != nil {
+		stopLoss, err := createTpSlTrigger(params.StopLoss, params, market, fees, *nonce)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create stop loss trigger: %w", err)
+		}
+		order.StopLoss = stopLoss
 	}
 
 	return order, nil
 }
 
+// getOppositeSide returns the opposite order side
+func getOppositeSide(side models.OrderSide) models.OrderSide {
+	if side == models.OrderSideBuy {
+		return models.OrderSideSell
+	}
+	return models.OrderSideBuy
+}
+
+// createTpSlTrigger creates a TPSL trigger model with settlement data for the opposite side order
+// Returns an error if TPSL trigger creation fails - this is critical for trading safety
+// nonce must be provided (same as the main order nonce)
+func createTpSlTrigger(
+	triggerParam *models.TpSlTriggerParam,
+	params createOrderObjectParams,
+	market models.MarketModel,
+	fees models.TradingFeeModel,
+	nonce int,
+) (*models.TpSlTrigger, error) {
+	if triggerParam == nil {
+		return nil, nil
+	}
+
+	oppositeSide := getOppositeSide(params.Side)
+	is_buying_synthetic := oppositeSide == models.OrderSideBuy
+
+	// use the TPSL trigger price (not the main order price)
+	tpslPrice := triggerParam.Price
+	collateral_amount := params.SyntheticAmount.Mul(tpslPrice)
+
+	// calculate fees
+	total_fee := fees.TakerFeeRate
+	if params.BuilderFee != nil {
+		total_fee = total_fee.Add(*params.BuilderFee)
+	}
+	fee_amount := total_fee.Mul(collateral_amount)
+
+	// convert to Stark amounts
+	stark_collateral_amount_dec := collateral_amount.Mul(decimal.NewFromInt(market.L2Config.CollateralResolution))
+	stark_synthetic_amount_dec := params.SyntheticAmount.Mul(decimal.NewFromInt(market.L2Config.SyntheticResolution))
+
+	// round accordingly
+	if is_buying_synthetic {
+		stark_collateral_amount_dec = stark_collateral_amount_dec.Ceil()
+		stark_synthetic_amount_dec = stark_synthetic_amount_dec.Ceil()
+	} else {
+		stark_collateral_amount_dec = stark_collateral_amount_dec.Floor()
+		stark_synthetic_amount_dec = stark_synthetic_amount_dec.Floor()
+	}
+
+	stark_collateral_amount := stark_collateral_amount_dec.IntPart()
+	stark_synthetic_amount := stark_synthetic_amount_dec.IntPart()
+	stark_fee_part := fee_amount.Mul(decimal.NewFromInt(market.L2Config.CollateralResolution)).Ceil().IntPart()
+
+	// apply sign based on side
+	if is_buying_synthetic {
+		stark_collateral_amount = -stark_collateral_amount
+	} else {
+		stark_synthetic_amount = -stark_synthetic_amount
+	}
+
+	tpslOrderHash, err := HashOrder(HashOrderParams{
+		AmountSynthetic:     stark_synthetic_amount,
+		SyntheticAssetID:    market.L2Config.SyntheticID,
+		AmountCollateral:    stark_collateral_amount,
+		CollateralAssetID:   market.L2Config.CollateralID,
+		MaxFee:              stark_fee_part,
+		Nonce:               nonce,
+		PositionID:          int(params.Account.Vault()),
+		ExpirationTimestamp: params.ExpireTime,
+		PublicKey:           params.Account.PublicKey(),
+		StarknetDomain:      params.StarknetDomain,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash TPSL order: %w", err)
+	}
+
+	sig_r, sig_s, err := params.Account.Sign(tpslOrderHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to sign TPSL order: %w", err)
+	}
+
+	tpslSettlement := models.Settlement{
+		Signature: models.Signature{
+			R: fmt.Sprintf("0x%x", sig_r),
+			S: fmt.Sprintf("0x%x", sig_s),
+		},
+		StarkKey:           params.Account.PublicKey(),
+		CollateralPosition: fmt.Sprintf("%d", params.Account.Vault()),
+	}
+
+	return &models.TpSlTrigger{
+		TriggerPrice:     triggerParam.TriggerPrice.String(),
+		TriggerPriceType: triggerParam.TriggerPriceType,
+		Price:            triggerParam.Price.String(),
+		PriceType:        triggerParam.PriceType,
+		Settlement:       tpslSettlement,
+	}, nil
+}
+
 // HashOrderParams represents the parameters for hashing an order
 type HashOrderParams struct {
 	AmountSynthetic     int64
-	SyntheticAssetID    string // hex string for asset ID
+	SyntheticAssetID    string // hex string for asset id
 	AmountCollateral    int64
-	CollateralAssetID   string // hex string for asset ID
+	CollateralAssetID   string // hex string for asset id
 	MaxFee              int64
 	Nonce               int
 	PositionID          int
@@ -235,7 +341,7 @@ func HashOrder(params HashOrderParams) (string, error) {
 		params.StarknetDomain.Name,                 // domain_name
 		params.StarknetDomain.Version,              // domain_version
 		params.StarknetDomain.ChainID,              // domain_chain_id
-		params.StarknetDomain.Revision,               // domain_revision
+		params.StarknetDomain.Revision,             // domain_revision
 	)
 
 	if err != nil {

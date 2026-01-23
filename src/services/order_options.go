@@ -120,7 +120,7 @@ func buildPlaceOrderConfig(
 	selfTradeProtectionLevel models.SelfTradeProtectionLevel,
 	opts ...PlaceOrderOption,
 ) *PlaceOrderConfig {
-	// Initialize config with required parameters
+	// initialize config with required parameters
 	config := &PlaceOrderConfig{
 		Market:                   market,
 		SyntheticAmount:          syntheticAmount,
@@ -129,13 +129,13 @@ func buildPlaceOrderConfig(
 		Type:                     orderType,
 		TimeInForce:              timeInForce,
 		SelfTradeProtectionLevel: selfTradeProtectionLevel,
-		// Defaults
+		// defaults
 		PostOnly:   false,
 		ReduceOnly: false,
-		Nonce:      nil, // Auto-generate if not provided via option
+		Nonce:      nil, // auto-generate if not provided via option
 	}
 
-	// Apply options
+	// apply options
 	for _, opt := range opts {
 		opt(config)
 	}

@@ -82,10 +82,8 @@ func (s *MarketsService) GetCandlesHistory(
 	limit *int,
 	endTime *time.Time,
 ) ([]models.CandleModel, error) {
-	// Build URL with path parameters
 	path := fmt.Sprintf("/info/candles/%s/%s", marketName, candleType)
 	
-	// Build query parameters
 	query := make(url.Values)
 	query.Set("interval", string(interval))
 	if limit != nil {
@@ -119,10 +117,8 @@ func (s *MarketsService) GetFundingRatesHistory(
 	startTime time.Time,
 	endTime time.Time,
 ) ([]models.FundingRateModel, error) {
-	// Build URL with path parameters
 	path := fmt.Sprintf("/info/%s/funding", marketName)
 	
-	// Build query parameters
 	query := make(url.Values)
 	query.Set("startTime", strconv.FormatInt(startTime.UnixMilli(), 10))
 	query.Set("endTime", strconv.FormatInt(endTime.UnixMilli(), 10))

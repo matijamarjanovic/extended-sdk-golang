@@ -31,7 +31,6 @@ func NewClient(
 		BaseClient: baseClient,
 	}
 
-	// Initialize services with reference to BaseClient
 	sdkClient.Account = &services.AccountService{Base: baseClient}
 	sdkClient.Orders = &services.OrdersService{Base: baseClient}
 	sdkClient.Markets = &services.MarketsService{Base: baseClient}

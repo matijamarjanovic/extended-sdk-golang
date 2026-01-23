@@ -35,7 +35,7 @@ func NewStarkPerpetualAccount(vault uint64, privateKeyHex, publicKeyHex, apiKey 
 		return nil, fmt.Errorf("invalid public key: %w", err)
 	}
 
-	// Ensure that private key and public key have 0x prefix
+	// ensure that private key and public key have 0x prefix
 	if len(privateKeyHex) < 2 || privateKeyHex[:2] != "0x" {
 		return nil, fmt.Errorf("private key must start with 0x")
 	}
@@ -43,7 +43,7 @@ func NewStarkPerpetualAccount(vault uint64, privateKeyHex, publicKeyHex, apiKey 
 		return nil, fmt.Errorf("public key must start with 0x")
 	}
 
-	// Check that API key does not start with 0x
+	// check that API key does not start with 0x
 	if len(apiKey) >= 2 && apiKey[:2] == "0x" {
 		return nil, fmt.Errorf("api key should not start with 0x")
 	}
@@ -77,8 +77,8 @@ func (stark *StarkPerpetualAccount) Sign(msgHash string) (*big.Int, *big.Int, er
 		return big.NewInt(0), big.NewInt(0), err
 	}
 
-	// Extract r, s from the signature string.
-	// Signature is in the format of {r}{s}{v}, where r, s and v are 64 chars each (192 hex chars).
+	// extract r, s from the signature string.
+	// signature is in the format of {r}{s}{v}, where r, s and v are 64 chars each (192 hex chars).
 	r, isGoodR := big.NewInt(0).SetString(sig[:64], 16)
 	s, isGoodS := big.NewInt(0).SetString(sig[64:128], 16)
 

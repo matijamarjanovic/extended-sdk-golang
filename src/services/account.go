@@ -96,10 +96,8 @@ func (s *AccountService) GetMarketFee(ctx context.Context, market string) ([]mod
 
 // GetFees retrieves trading fees for specified markets (matches Python SDK signature)
 func (s *AccountService) GetFees(ctx context.Context, marketNames []string, builderID *int) ([]models.TradingFeeModel, error) {
-	// Build URL with query parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/fees"
 	
-	// Build query string manually to handle multiple market parameters
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
@@ -130,7 +128,6 @@ func (s *AccountService) GetFees(ctx context.Context, marketNames []string, buil
 
 // GetPositions retrieves current positions, optionally filtered by market names and position side
 func (s *AccountService) GetPositions(ctx context.Context, marketNames []string, positionSide *models.PositionSide) ([]models.PositionModel, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -162,7 +159,6 @@ func (s *AccountService) GetPositions(ctx context.Context, marketNames []string,
 
 // GetPositionsHistory retrieves position history with optional filters
 func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []string, positionSide *models.PositionSide, cursor *int, limit *int) ([]models.PositionHistoryModel, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions/history"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -200,7 +196,6 @@ func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []
 
 // GetOpenOrders retrieves open orders with optional filters
 func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide) ([]models.OpenOrderModel, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -235,7 +230,6 @@ func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string
 
 // GetOrdersHistory retrieves order history with optional filters
 func (s *AccountService) GetOrdersHistory(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide, cursor *int, limit *int) ([]models.OpenOrderModel, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders/history"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -318,7 +312,6 @@ func (s *AccountService) GetOrderByExternalID(ctx context.Context, externalID st
 
 // GetTrades retrieves trades with optional filters
 func (s *AccountService) GetTrades(ctx context.Context, marketNames []string, tradeSide *models.OrderSide, tradeType *models.TradeType, cursor *int, limit *int) ([]models.AccountTradeModel, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/trades"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -359,7 +352,6 @@ func (s *AccountService) GetTrades(ctx context.Context, marketNames []string, tr
 
 // GetLeverage retrieves leverage for specified markets
 func (s *AccountService) GetLeverage(ctx context.Context, marketNames []string) ([]models.AccountLeverage, error) {
-	// Build URL manually to handle multiple market parameters
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/leverage"
 	queryParts := []string{}
 	for _, market := range marketNames {
@@ -437,19 +429,16 @@ func (s *AccountService) UpdateLeverage(ctx context.Context, marketName string, 
 		return fmt.Errorf("failed to build URL: %w", err)
 	}
 
-	// Create request body
 	requestBody := models.AccountLeverage{
 		Market:   marketName,
 		Leverage: leverage,
 	}
 
-	// Marshal to JSON
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request body: %w", err)
 	}
 
-	// Create buffer with JSON data
 	body := bytes.NewBuffer(jsonData)
 
 	var emptyResponse models.EmptyResponse
@@ -534,7 +523,6 @@ func (s *AccountService) AssetOperations(
 	cursor *int,
 	limit *int,
 ) ([]models.AssetOperationModel, error) {
-	// Build URL manually to handle multiple query parameters with the same key
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/assetOperations"
 	query := make(url.Values)
 	

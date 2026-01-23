@@ -16,7 +16,7 @@ func isHexString(s string) error {
 	if len(s) == 0 {
 		return errors.New("empty hex after 0x")
 	}
-	// Validate hex characters
+	// validate hex characters
 	for _, c := range s {
 		if (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F') {
 			return fmt.Errorf("invalid hex char %q", c)

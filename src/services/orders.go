@@ -43,7 +43,7 @@ func (s *OrdersService) PlaceOrder(
 	selfTradeProtectionLevel models.SelfTradeProtectionLevel,
 	opts ...PlaceOrderOption,
 ) (*models.OrderResponse, error) {
-	// Build config from options
+	// build config from options
 	config := buildPlaceOrderConfig(
 		market,
 		syntheticAmount,
@@ -55,7 +55,7 @@ func (s *OrdersService) PlaceOrder(
 		opts...,
 	)
 
-	// Get account and config from BaseClient
+	// get account and config from BaseClient
 	account, err := s.Base.StarkAccount()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get stark account: %w", err)
@@ -63,14 +63,14 @@ func (s *OrdersService) PlaceOrder(
 
 	endpointConfig := s.Base.EndpointConfig()
 
-	// Set default expire time if not provided (1 hour from now)
+	// set default expire time if not provided (1 hour from now)
 	expireTime := config.ExpireTime
 	if expireTime == nil {
 		defaultExpire := time.Now().Add(1 * time.Hour)
 		expireTime = &defaultExpire
 	}
 
-	// Create order object
+	// create order object
 	order, err := createOrderObject(createOrderObjectParams{
 		Market:                   config.Market,
 		Account:                  account,
@@ -97,7 +97,6 @@ func (s *OrdersService) PlaceOrder(
 		return nil, fmt.Errorf("failed to create order object: %w", err)
 	}
 
-	// Submit the order
 	return s.submitOrder(ctx, order)
 }
 
@@ -175,13 +174,11 @@ func (s *OrdersService) MassCancel(
 		request.CancelAll = &cancelAll
 	}
 
-	// Marshal the request to JSON
 	requestJSON, err := json.Marshal(request)
 	if err != nil {
 		return fmt.Errorf("failed to marshal request to JSON: %w", err)
 	}
 
-	// Create a buffer with the JSON data
 	jsonData := bytes.NewBuffer(requestJSON)
 
 	var emptyResponse models.EmptyResponse
@@ -198,7 +195,6 @@ func (s *OrdersService) MassCancel(
 
 // submitOrder submits a perpetual order to the trading API
 func (s *OrdersService) submitOrder(ctx context.Context, order *models.PerpetualOrderModel) (*models.OrderResponse, error) {
-	// Validate order object is complete and properly signed
 	if order == nil {
 		return nil, fmt.Errorf("order is nil")
 	}
@@ -208,16 +204,13 @@ func (s *OrdersService) submitOrder(ctx context.Context, order *models.Perpetual
 		return nil, fmt.Errorf("failed to build URL: %w", err)
 	}
 
-	// Marshal the order to JSON
 	orderJSON, err := json.Marshal(order)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal order to JSON: %w", err)
 	}
 
-	// Create a buffer with the JSON data
 	jsonData := bytes.NewBuffer(orderJSON)
 
-	// Use the DoRequest method to handle the HTTP request and JSON parsing
 	var orderResponse models.OrderResponse
 	if err := s.Base.DoRequest(ctx, "POST", baseUrl, jsonData, &orderResponse); err != nil {
 		return nil, err

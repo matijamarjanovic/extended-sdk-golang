@@ -11,8 +11,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Test setup functions
-
 func init() { load() }
 
 func load() {
@@ -41,7 +39,7 @@ func createTestClient() *Client {
 	account, err := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
 
 	if err != nil {
-		panic("Failed to create StarkPerpetualAccount: " + err.Error())
+		panic("failed to create StarkPerpetualAccount: " + err.Error())
 	}
 
 	return NewClient(STARKNET_MAINNET_CONFIG, account, 30*time.Second)

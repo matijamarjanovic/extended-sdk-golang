@@ -56,18 +56,15 @@ func (sc *StreamConnection) Recv(ctx context.Context, result interface{}) error 
 
 	sc.msgsCount++
 
-	// First, unmarshal into WrappedStreamResponse to check for errors
 	var wrapped models.WrappedStreamResponse
 	if err := json.Unmarshal(message, &wrapped); err != nil {
 		return fmt.Errorf("failed to unmarshal wrapped response: %w", err)
 	}
 
-	// Check for stream errors
 	if wrapped.Error != nil {
 		return fmt.Errorf("stream error: %s", *wrapped.Error)
 	}
 
-	// Unmarshal the data field into the result type
 	if wrapped.Data != nil {
 		dataBytes, err := json.Marshal(wrapped.Data)
 		if err != nil {

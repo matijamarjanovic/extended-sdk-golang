@@ -11,13 +11,14 @@ type L2ConfigModel struct {
 }
 
 type MarketModel struct {
-	Name                     string        `json:"name"`
-	AssetName                string        `json:"assetName"`
-	AssetPrecision           int           `json:"assetPrecision"`
-	CollateralAssetName      string        `json:"collateralAssetName"`
-	CollateralAssetPrecision int           `json:"collateralAssetPrecision"`
-	Active                   bool          `json:"active"`
-	L2Config                 L2ConfigModel `json:"l2Config"`
+	Name                     string             `json:"name"`
+	AssetName                string             `json:"assetName"`
+	AssetPrecision           int                `json:"assetPrecision"`
+	CollateralAssetName      string             `json:"collateralAssetName"`
+	CollateralAssetPrecision int                `json:"collateralAssetPrecision"`
+	Active                   bool               `json:"active"`
+	L2Config                 L2ConfigModel       `json:"l2Config"`
+	TradingConfig            *TradingConfigModel `json:"tradingConfig,omitempty"`
 	// Note: MarketStats and TradingConfig are typically included in API responses
 	// but may not always be present, so they're separate models
 }
@@ -52,7 +53,7 @@ type TradingConfigModel struct {
 	MaxLimitOrderValue  decimal.Decimal    `json:"maxLimitOrderValue"`
 	MaxPositionValue    decimal.Decimal    `json:"maxPositionValue"`
 	MaxLeverage         decimal.Decimal    `json:"maxLeverage"`
-	MaxNumOrders        int                `json:"maxNumOrders"`
+	MaxNumOrders        string             `json:"maxNumOrders"`
 	LimitPriceCap       decimal.Decimal    `json:"limitPriceCap"`
 	LimitPriceFloor     decimal.Decimal    `json:"limitPriceFloor"`
 	RiskFactorConfig    []RiskFactorConfig `json:"riskFactorConfig"`
