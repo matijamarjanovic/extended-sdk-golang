@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/websocket"
 	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
 	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
-	"github.com/gorilla/websocket"
 )
 
 type StreamingService struct {

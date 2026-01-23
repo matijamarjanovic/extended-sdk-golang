@@ -1,25 +1,25 @@
-package examples
+package main
 
 import (
 	"os"
 	"strconv"
 	"time"
 
-	sdk "github.com/matijamarjanovic/extended-sdk-golang/x10"
 	"github.com/joho/godotenv"
+	sdk "github.com/matijamarjanovic/extended-sdk-golang/x10"
 )
 
 func main() {
 	godotenv.Load()
 
 	// read account credentials from environment
-	vaultStr := os.Getenv("VAULT")
+	vaultStr := os.Getenv("TESTNET_VAULT_ID")
 	vault, _ := strconv.ParseUint(vaultStr, 10, 64)
-	privateKey := os.Getenv("PRIVATE_KEY")
-	publicKey := os.Getenv("PUBLIC_KEY")
-	apiKey := os.Getenv("API_KEY")
+	privateKey := os.Getenv("TESTNET_PRIVATE_KEY")
+	publicKey := os.Getenv("TESTNET_PUBLIC_KEY")
+	apiKey := os.Getenv("TESTNET_API_KEY")
 
-	// create starknet account (panics on error)
+	// create starknet account
 	account := sdk.NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
 
 	// create client with testnet configuration
