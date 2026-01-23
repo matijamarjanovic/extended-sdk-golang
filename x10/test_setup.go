@@ -1,4 +1,4 @@
-package sdk
+package x10
 
 import (
 	"os"
@@ -42,7 +42,7 @@ func createTestClient() *Client {
 }
 
 // Type aliases for commonly used model types in tests
-// These allow using shorter names in test files without the models. prefix
+// These allow using shorter names in test files without the models.
 
 type MarketModel = models.MarketModel
 type L2ConfigModel = models.L2ConfigModel

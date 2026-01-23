@@ -1,4 +1,4 @@
-package sdk
+package x10
 
 import "github.com/matijamarjanovic/extended-sdk-golang/x10/client"
 
