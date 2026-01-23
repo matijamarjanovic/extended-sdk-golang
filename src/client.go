@@ -44,4 +44,3 @@ func NewClient(
 func (c *Client) Close() {
 	c.BaseClient.Close()
 }
-

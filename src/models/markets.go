@@ -11,12 +11,12 @@ type L2ConfigModel struct {
 }
 
 type MarketModel struct {
-	Name                     string             `json:"name"`
-	AssetName                string             `json:"assetName"`
-	AssetPrecision           int                `json:"assetPrecision"`
-	CollateralAssetName      string             `json:"collateralAssetName"`
-	CollateralAssetPrecision int                `json:"collateralAssetPrecision"`
-	Active                   bool               `json:"active"`
+	Name                     string              `json:"name"`
+	AssetName                string              `json:"assetName"`
+	AssetPrecision           int                 `json:"assetPrecision"`
+	CollateralAssetName      string              `json:"collateralAssetName"`
+	CollateralAssetPrecision int                 `json:"collateralAssetPrecision"`
+	Active                   bool                `json:"active"`
 	L2Config                 L2ConfigModel       `json:"l2Config"`
 	TradingConfig            *TradingConfigModel `json:"tradingConfig,omitempty"`
 	// Note: MarketStats and TradingConfig are typically included in API responses
@@ -29,20 +29,20 @@ type RiskFactorConfig struct {
 }
 
 type MarketStatsModel struct {
-	DailyVolume        decimal.Decimal `json:"dailyVolume"`
-	DailyVolumeBase    decimal.Decimal `json:"dailyVolumeBase"`
-	DailyPriceChange   decimal.Decimal `json:"dailyPriceChange"`
-	DailyLow           decimal.Decimal `json:"dailyLow"`
-	DailyHigh          decimal.Decimal `json:"dailyHigh"`
-	LastPrice          decimal.Decimal `json:"lastPrice"`
-	AskPrice           decimal.Decimal `json:"askPrice"`
-	BidPrice           decimal.Decimal `json:"bidPrice"`
-	MarkPrice          decimal.Decimal `json:"markPrice"`
-	IndexPrice         decimal.Decimal `json:"indexPrice"`
-	FundingRate        decimal.Decimal `json:"fundingRate"`
-	NextFundingRate    int64          `json:"nextFundingRate"`
-	OpenInterest       decimal.Decimal `json:"openInterest"`
-	OpenInterestBase   decimal.Decimal `json:"openInterestBase"`
+	DailyVolume      decimal.Decimal `json:"dailyVolume"`
+	DailyVolumeBase  decimal.Decimal `json:"dailyVolumeBase"`
+	DailyPriceChange decimal.Decimal `json:"dailyPriceChange"`
+	DailyLow         decimal.Decimal `json:"dailyLow"`
+	DailyHigh        decimal.Decimal `json:"dailyHigh"`
+	LastPrice        decimal.Decimal `json:"lastPrice"`
+	AskPrice         decimal.Decimal `json:"askPrice"`
+	BidPrice         decimal.Decimal `json:"bidPrice"`
+	MarkPrice        decimal.Decimal `json:"markPrice"`
+	IndexPrice       decimal.Decimal `json:"indexPrice"`
+	FundingRate      decimal.Decimal `json:"fundingRate"`
+	NextFundingRate  int64           `json:"nextFundingRate"`
+	OpenInterest     decimal.Decimal `json:"openInterest"`
+	OpenInterestBase decimal.Decimal `json:"openInterestBase"`
 }
 
 type TradingConfigModel struct {
@@ -90,15 +90,15 @@ type CandleModel struct {
 }
 
 type FundingRateModel struct {
-	Market       string          `json:"m"`
-	FundingRate  decimal.Decimal `json:"f"`
-	Timestamp    int64           `json:"T"`
+	Market      string          `json:"m"`
+	FundingRate decimal.Decimal `json:"f"`
+	Timestamp   int64           `json:"T"`
 }
 
 type PublicTradeModel struct {
 	ID        int             `json:"id"`
 	Market    string          `json:"market"`
-	Side      string          `json:"side"` // OrderSide
+	Side      string          `json:"side"`      // OrderSide
 	TradeType string          `json:"tradeType"` // TradeType
 	Timestamp int64           `json:"timestamp"`
 	Price     decimal.Decimal `json:"price"`
@@ -111,8 +111,7 @@ type OrderbookQuantityModel struct {
 }
 
 type OrderbookUpdateModel struct {
-	Market string                  `json:"m"`
+	Market string                   `json:"m"`
 	Bid    []OrderbookQuantityModel `json:"b"`
 	Ask    []OrderbookQuantityModel `json:"a"`
 }
-

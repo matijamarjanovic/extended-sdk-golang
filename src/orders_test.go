@@ -32,7 +32,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 	// cleanup function to cancel all orders at the end
 	defer func() {
 		t.Logf("cleaning up %d tracked orders", len(placedOrders))
-		
+
 		for _, order := range placedOrders {
 			err := client.Orders.CancelOrderByExternalID(ctx, order.externalID)
 			if err != nil {
@@ -49,14 +49,14 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, nil, nil)
 		if err == nil && len(openOrders) > 0 {
 			t.Logf("found %d remaining open orders after cleanup, canceling them all", len(openOrders))
-			
+
 			var orderIDs []int
-			
+
 			for _, openOrder := range openOrders {
 				orderIDs = append(orderIDs, openOrder.ID)
 				t.Logf("found remaining order: ID=%d, ExternalID=%s", openOrder.ID, openOrder.ExternalID)
 			}
-			
+
 			if len(orderIDs) > 0 {
 				err := client.Orders.MassCancel(ctx, orderIDs, nil, nil, false)
 				if err != nil {
@@ -84,7 +84,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 
 		response, err := client.Orders.PlaceOrder(ctx,
 			market,
-			decimal.NewFromFloat(0.0001), 
+			decimal.NewFromFloat(0.0001),
 			decimal.NewFromFloat(1000),
 			OrderSideBuy,
 			models.OrderTypeLimit,
@@ -336,7 +336,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		require.NoError(t, err, "should be able to get market stats")
 
 		orderbook, err := client.Markets.GetOrderbookSnapshot(ctx, "BTC-USD")
-		
+
 		var orderPrice decimal.Decimal
 		if err == nil && orderbook != nil && len(orderbook.Ask) > 0 {
 			orderPrice = orderbook.Ask[1].Price
@@ -676,10 +676,10 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 	// test 1: place order with take profit only
 	t.Run("PlaceOrderWithTakeProfit", func(t *testing.T) {
 		expireTime := time.Now().Add(1 * time.Hour)
-		
+
 		stats, err := client.Markets.GetMarketStatistics(ctx, "BTC-USD")
 		require.NoError(t, err, "should be able to get market stats")
-		
+
 		basePrice := stats.MarkPrice
 		if basePrice.IsZero() {
 			basePrice = decimal.NewFromFloat(50000)
@@ -727,7 +727,7 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 			require.NotNil(t, order.TakeProfit, "order should have take profit set")
 			require.NotNil(t, order.TpSlType, "order should have TPSL type set")
 			require.Equal(t, models.TpSlTypeOrder, *order.TpSlType, "TPSL type should be ORDER")
-			t.Logf("verified order has take profit: trigger=%s, price=%s", 
+			t.Logf("verified order has take profit: trigger=%s, price=%s",
 				order.TakeProfit.TriggerPrice.String(), order.TakeProfit.Price.String())
 		}
 	})
@@ -735,10 +735,10 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 	// test 2: place order with stop loss only
 	t.Run("PlaceOrderWithStopLoss", func(t *testing.T) {
 		expireTime := time.Now().Add(1 * time.Hour)
-		
+
 		stats, err := client.Markets.GetMarketStatistics(ctx, "BTC-USD")
 		require.NoError(t, err, "should be able to get market stats")
-		
+
 		basePrice := stats.MarkPrice
 		if basePrice.IsZero() {
 			basePrice = decimal.NewFromFloat(50000)
@@ -783,7 +783,7 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 		if err == nil && len(orders) > 0 {
 			order := orders[0]
 			require.NotNil(t, order.StopLoss, "order should have stop loss set")
-			t.Logf("verified order has stop loss: trigger=%s, price=%s", 
+			t.Logf("verified order has stop loss: trigger=%s, price=%s",
 				order.StopLoss.TriggerPrice.String(), order.StopLoss.Price.String())
 		}
 	})
@@ -791,17 +791,17 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 	// test 3: place order with both take profit and stop loss
 	t.Run("PlaceOrderWithBothTPSL", func(t *testing.T) {
 		expireTime := time.Now().Add(1 * time.Hour)
-		
+
 		stats, err := client.Markets.GetMarketStatistics(ctx, "BTC-USD")
 		require.NoError(t, err, "should be able to get market stats")
-		
+
 		basePrice := stats.MarkPrice
 		if basePrice.IsZero() {
 			basePrice = decimal.NewFromFloat(50000)
 		}
 		basePrice = roundPrice(basePrice)
 		orderPrice := roundPrice(basePrice.Mul(decimal.NewFromFloat(0.95)))
-		
+
 		tpPrice := roundPrice(orderPrice.Mul(decimal.NewFromFloat(1.05)))
 		tpTriggerPrice := roundPrice(orderPrice.Mul(decimal.NewFromFloat(1.03)))
 		slPrice := roundPrice(orderPrice.Mul(decimal.NewFromFloat(0.98)))
@@ -849,7 +849,7 @@ func TestOrderPlacementWithTPSL(t *testing.T) {
 			order := orders[0]
 			require.NotNil(t, order.TakeProfit, "order should have take profit set")
 			require.NotNil(t, order.StopLoss, "order should have stop loss set")
-			t.Logf("verified order has both TPSL: TP trigger=%s, SL trigger=%s", 
+			t.Logf("verified order has both TPSL: TP trigger=%s, SL trigger=%s",
 				order.TakeProfit.TriggerPrice.String(), order.StopLoss.TriggerPrice.String())
 		}
 	})
@@ -901,4 +901,3 @@ func TestOrderPlacementErrorHandling(t *testing.T) {
 		}
 	})
 }
-

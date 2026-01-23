@@ -108,7 +108,7 @@ func (m *BaseClient) DoRequest(ctx context.Context, method, url string, body io.
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "ExtendedSDKGolang/0.1.0")
 	req.Header.Set("Content-Type", "application/json")
-	
+
 	if m.apiKey != "" {
 		req.Header.Set("X-Api-Key", m.apiKey)
 	}

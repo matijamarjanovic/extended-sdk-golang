@@ -338,10 +338,10 @@ func TestAccountService_UpdateLeverage(t *testing.T) {
 	updatedLeverage, err := client.Account.GetLeverage(ctx, []string{"BTC-USD"})
 	require.NoError(t, err, "should not error when getting updated leverage")
 	require.Greater(t, len(updatedLeverage), 0, "should have at least one leverage entry")
-	
+
 	err = client.Account.UpdateLeverage(ctx, "BTC-USD", currentLeverage)
 	require.NoError(t, err, "should not error when restoring leverage")
-	
+
 	t.Logf("updated leverage from %s to %s and restored", currentLeverage.String(), newLeverage.String())
 }
 
@@ -403,9 +403,8 @@ func TestAccountService_AssetOperations_WithFilters(t *testing.T) {
 	require.NotNil(t, operations, "operations should not be nil")
 	assert.LessOrEqual(t, len(operations), limit, "should respect limit")
 	t.Logf("got %d asset operations with filters", len(operations))
-	
+
 	for _, op := range operations {
 		t.Logf("operation ID: %s, type: %s, status: %s, amount: %s", op.ID, op.Type, op.Status, op.Amount.String())
 	}
 }
-

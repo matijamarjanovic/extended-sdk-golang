@@ -93,4 +93,3 @@ func SignMessage(messageHex, privateKeyHex string) (string, error) {
 
 	return C.GoString(sig), nil
 }
-

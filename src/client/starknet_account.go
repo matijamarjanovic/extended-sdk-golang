@@ -15,14 +15,14 @@ type StarkPerpetualAccount struct {
 	privateKey string
 	publicKey  string
 	apiKey     string
-	
+
 	// tradingFee caches market-specific trading fees retrieved from the API via GET /api/v1/user/fees?market={market}
 	// The map key is the market name (e.g., "BTC-USD")
 	// Fees are determined by the platform for each sub-account and cannot be set by users.
 	// This cache should be populated by calling AccountService.GetMarketFee() or AccountService.GetFees()
 	// and then updating the cache using SetTradingFee() or SetTradingFees().
 	// If a market is not found in this cache, DefaultFees will be used as fallback.
-	tradingFee map[string]models.TradingFeeModel
+	tradingFee   map[string]models.TradingFeeModel
 	tradingFeeMu sync.RWMutex // Protects tradingFee map
 }
 
@@ -97,7 +97,7 @@ func (stark *StarkPerpetualAccount) Sign(msgHash string) (*big.Int, *big.Int, er
 func (s *StarkPerpetualAccount) GetTradingFee(marketName string) models.TradingFeeModel {
 	s.tradingFeeMu.RLock()
 	defer s.tradingFeeMu.RUnlock()
-	
+
 	if fee, ok := s.tradingFee[marketName]; ok {
 		return fee
 	}
@@ -110,7 +110,7 @@ func (s *StarkPerpetualAccount) GetTradingFee(marketName string) models.TradingF
 func (s *StarkPerpetualAccount) SetTradingFee(marketName string, fee models.TradingFeeModel) {
 	s.tradingFeeMu.Lock()
 	defer s.tradingFeeMu.Unlock()
-	
+
 	s.tradingFee[marketName] = fee
 }
 
@@ -120,9 +120,8 @@ func (s *StarkPerpetualAccount) SetTradingFee(marketName string, fee models.Trad
 func (s *StarkPerpetualAccount) SetTradingFees(fees map[string]models.TradingFeeModel) {
 	s.tradingFeeMu.Lock()
 	defer s.tradingFeeMu.Unlock()
-	
+
 	for market, fee := range fees {
 		s.tradingFee[market] = fee
 	}
 }
-

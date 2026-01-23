@@ -3,15 +3,15 @@ package models
 import "github.com/shopspring/decimal"
 
 type BalanceModel struct {
-	CollateralName           string          `json:"collateralName"`
-	Balance                  decimal.Decimal `json:"balance"`
-	Equity                   decimal.Decimal `json:"equity"`
-	AvailableForTrade        decimal.Decimal `json:"availableForTrade"`
-	AvailableForWithdrawal    decimal.Decimal `json:"availableForWithdrawal"`
-	UnrealisedPnl            decimal.Decimal `json:"unrealisedPnl"`
-	InitialMargin            decimal.Decimal `json:"initialMargin"`
-	MarginRatio              decimal.Decimal `json:"marginRatio"`
-	UpdatedTime              int64           `json:"updatedTime"`
+	CollateralName         string          `json:"collateralName"`
+	Balance                decimal.Decimal `json:"balance"`
+	Equity                 decimal.Decimal `json:"equity"`
+	AvailableForTrade      decimal.Decimal `json:"availableForTrade"`
+	AvailableForWithdrawal decimal.Decimal `json:"availableForWithdrawal"`
+	UnrealisedPnl          decimal.Decimal `json:"unrealisedPnl"`
+	InitialMargin          decimal.Decimal `json:"initialMargin"`
+	MarginRatio            decimal.Decimal `json:"marginRatio"`
+	UpdatedTime            int64           `json:"updatedTime"`
 }
 
 type PositionSide string
@@ -29,24 +29,24 @@ const (
 )
 
 type PositionModel struct {
-	ID              int             `json:"id"`
-	AccountID       int             `json:"accountId"`
-	Market          string          `json:"market"`
-	Status          PositionStatus  `json:"status"`
-	Side            PositionSide    `json:"side"`
-	Leverage        decimal.Decimal `json:"leverage"`
-	Size            decimal.Decimal `json:"size"`
-	Value           decimal.Decimal `json:"value"`
-	OpenPrice       decimal.Decimal `json:"openPrice"`
-	MarkPrice       decimal.Decimal `json:"markPrice"`
+	ID               int              `json:"id"`
+	AccountID        int              `json:"accountId"`
+	Market           string           `json:"market"`
+	Status           PositionStatus   `json:"status"`
+	Side             PositionSide     `json:"side"`
+	Leverage         decimal.Decimal  `json:"leverage"`
+	Size             decimal.Decimal  `json:"size"`
+	Value            decimal.Decimal  `json:"value"`
+	OpenPrice        decimal.Decimal  `json:"openPrice"`
+	MarkPrice        decimal.Decimal  `json:"markPrice"`
 	LiquidationPrice *decimal.Decimal `json:"liquidationPrice,omitempty"`
-	UnrealisedPnl   decimal.Decimal `json:"unrealisedPnl"`
-	RealisedPnl     decimal.Decimal `json:"realisedPnl"`
-	TpPrice         *decimal.Decimal `json:"tpPrice,omitempty"`
-	SlPrice         *decimal.Decimal `json:"slPrice,omitempty"`
-	Adl             *int             `json:"adl,omitempty"`
-	CreatedAt       int64           `json:"createdAt"`
-	UpdatedAt       int64           `json:"updatedAt"`
+	UnrealisedPnl    decimal.Decimal  `json:"unrealisedPnl"`
+	RealisedPnl      decimal.Decimal  `json:"realisedPnl"`
+	TpPrice          *decimal.Decimal `json:"tpPrice,omitempty"`
+	SlPrice          *decimal.Decimal `json:"slPrice,omitempty"`
+	Adl              *int             `json:"adl,omitempty"`
+	CreatedAt        int64            `json:"createdAt"`
+	UpdatedAt        int64            `json:"updatedAt"`
 }
 
 type ExitType string
@@ -65,31 +65,31 @@ type RealisedPnlBreakdownModel struct {
 }
 
 type PositionHistoryModel struct {
-	ID                  int                     `json:"id"`
-	AccountID           int                     `json:"accountId"`
-	Market              string                  `json:"market"`
-	Side                PositionSide            `json:"side"`
-	Size                decimal.Decimal         `json:"size"`
-	MaxPositionSize     decimal.Decimal         `json:"maxPositionSize"`
-	Leverage            decimal.Decimal         `json:"leverage"`
-	OpenPrice           decimal.Decimal        `json:"openPrice"`
-	ExitPrice           *decimal.Decimal       `json:"exitPrice,omitempty"`
-	RealisedPnl         decimal.Decimal         `json:"realisedPnl"`
+	ID                   int                       `json:"id"`
+	AccountID            int                       `json:"accountId"`
+	Market               string                    `json:"market"`
+	Side                 PositionSide              `json:"side"`
+	Size                 decimal.Decimal           `json:"size"`
+	MaxPositionSize      decimal.Decimal           `json:"maxPositionSize"`
+	Leverage             decimal.Decimal           `json:"leverage"`
+	OpenPrice            decimal.Decimal           `json:"openPrice"`
+	ExitPrice            *decimal.Decimal          `json:"exitPrice,omitempty"`
+	RealisedPnl          decimal.Decimal           `json:"realisedPnl"`
 	RealisedPnlBreakdown RealisedPnlBreakdownModel `json:"realisedPnlBreakdown"`
-	CreatedTime         int64                   `json:"createdTime"`
-	ExitType            *ExitType               `json:"exitType,omitempty"`
-	ClosedTime          *int64                  `json:"closedTime,omitempty"`
+	CreatedTime          int64                     `json:"createdTime"`
+	ExitType             *ExitType                 `json:"exitType,omitempty"`
+	ClosedTime           *int64                    `json:"closedTime,omitempty"`
 }
 
 type AccountModel struct {
-	ID                   int      `json:"id"`
-	Description          string   `json:"description"`
-	AccountIndex         int      `json:"accountIndex"`
-	Status               string   `json:"status"`
-	L2Key                string   `json:"l2Key"`
-	L2Vault              string   `json:"l2Vault"`
+	ID                    int      `json:"id"`
+	Description           string   `json:"description"`
+	AccountIndex          int      `json:"accountIndex"`
+	Status                string   `json:"status"`
+	L2Key                 string   `json:"l2Key"`
+	L2Vault               string   `json:"l2Vault"`
 	BridgeStarknetAddress *string  `json:"bridgeStarknetAddress,omitempty"`
-	APIKeys              []string `json:"apiKeys,omitempty"`
+	APIKeys               []string `json:"apiKeys,omitempty"`
 }
 
 type ClientModel struct {
@@ -101,7 +101,7 @@ type ClientModel struct {
 
 type AccountLeverage struct {
 	Market   string          `json:"market"`
-	Leverage  decimal.Decimal `json:"leverage"`
+	Leverage decimal.Decimal `json:"leverage"`
 }
 
 type TradeType string
@@ -146,16 +146,16 @@ const (
 )
 
 type AssetOperationModel struct {
-	ID                   string               `json:"id"`
-	Type                 AssetOperationType   `json:"type"`
-	Status               AssetOperationStatus `json:"status"`
-	Amount               decimal.Decimal     `json:"amount"`
-	Fee                  decimal.Decimal     `json:"fee"`
-	Asset                int                 `json:"asset"`
-	Time                 int64               `json:"time"`
-	AccountID            int                 `json:"accountId"`
-	CounterpartyAccountID *int                `json:"counterpartyAccountId,omitempty"`
-	TransactionHash      *string             `json:"transactionHash,omitempty"`
+	ID                    string               `json:"id"`
+	Type                  AssetOperationType   `json:"type"`
+	Status                AssetOperationStatus `json:"status"`
+	Amount                decimal.Decimal      `json:"amount"`
+	Fee                   decimal.Decimal      `json:"fee"`
+	Asset                 int                  `json:"asset"`
+	Time                  int64                `json:"time"`
+	AccountID             int                  `json:"accountId"`
+	CounterpartyAccountID *int                 `json:"counterpartyAccountId,omitempty"`
+	TransactionHash       *string              `json:"transactionHash,omitempty"`
 }
 
 type ChainConfig struct {
@@ -171,4 +171,3 @@ type Quote struct {
 	ID  string          `json:"id"`
 	Fee decimal.Decimal `json:"fee"`
 }
-

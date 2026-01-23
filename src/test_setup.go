@@ -71,4 +71,3 @@ const (
 	SelfTradeProtectionAccount  = models.SelfTradeProtectionAccount
 	SelfTradeProtectionClient   = models.SelfTradeProtectionClient
 )
-

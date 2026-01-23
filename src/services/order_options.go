@@ -19,7 +19,7 @@ type PlaceOrderConfig struct {
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
 
 	// Optional fields with defaults
-	Nonce                    *int // nil means auto-generate
+	Nonce                   *int // nil means auto-generate
 	PostOnly                bool
 	ReduceOnly              bool
 	ExpireTime              *time.Time // nil means default (1 hour from now)
@@ -142,4 +142,3 @@ func buildPlaceOrderConfig(
 
 	return config
 }
-

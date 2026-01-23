@@ -20,8 +20,8 @@ type StreamingService struct {
 // StreamConnection represents an active WebSocket connection to a stream.
 // It provides methods to receive messages and manage the connection lifecycle.
 type StreamConnection struct {
-	conn     *websocket.Conn
-	closed   bool
+	conn      *websocket.Conn
+	closed    bool
 	msgsCount int64
 }
 
@@ -86,17 +86,17 @@ func (s *StreamingService) SubscribeToOrderbooks(ctx context.Context, marketName
 	if marketName != "" {
 		path = "/orderbooks/" + marketName
 	}
-	
+
 	query := make(map[string]string)
 	if depth != nil {
 		query["depth"] = strconv.Itoa(*depth)
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, query)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
@@ -107,12 +107,12 @@ func (s *StreamingService) SubscribeToPublicTrades(ctx context.Context, marketNa
 	if marketName != "" {
 		path = "/publicTrades/" + marketName
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, nil)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
@@ -123,28 +123,28 @@ func (s *StreamingService) SubscribeToFundingRates(ctx context.Context, marketNa
 	if marketName != "" {
 		path = "/funding/" + marketName
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, nil)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
 // SubscribeToCandles subscribes to candle updates for a specific market, candle type, and interval.
 func (s *StreamingService) SubscribeToCandles(ctx context.Context, marketName string, candleType models.CandleType, interval models.CandleInterval) (*StreamConnection, error) {
 	path := fmt.Sprintf("/candles/%s/%s", marketName, candleType)
-	
+
 	query := map[string]string{
 		"interval": string(interval),
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, query)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
@@ -155,7 +155,7 @@ func (s *StreamingService) SubscribeToAccountUpdates(ctx context.Context) (*Stre
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
@@ -167,12 +167,12 @@ func (s *StreamingService) SubscribeToMarkPrices(ctx context.Context, marketName
 	if marketName != "" {
 		path = "/prices/mark/" + marketName
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, nil)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
@@ -185,25 +185,25 @@ func (s *StreamingService) SubscribeToIndexPrices(ctx context.Context, marketNam
 	if marketName != "" {
 		path = "/prices/index/" + marketName
 	}
-	
+
 	streamURL, err := s.buildStreamURL(path, nil)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return s.connect(ctx, streamURL)
 }
 
 // buildStreamURL builds a WebSocket URL for the given path and parameters.
 func (s *StreamingService) buildStreamURL(path string, query map[string]string) (string, error) {
 	streamBaseURL := s.Base.EndpointConfig().StreamURL
-	
+
 	streamBaseURL = strings.TrimSuffix(streamBaseURL, "/")
-	
+
 	path = strings.TrimPrefix(path, "/")
-	
+
 	fullURL := streamBaseURL + "/" + path
-	
+
 	if len(query) > 0 {
 		u, err := url.Parse(fullURL)
 		if err != nil {
@@ -216,30 +216,30 @@ func (s *StreamingService) buildStreamURL(path string, query map[string]string) 
 		u.RawQuery = q.Encode()
 		fullURL = u.String()
 	}
-	
+
 	return fullURL, nil
 }
 
 // connect establishes a WebSocket connection to the given URL.
 func (s *StreamingService) connect(ctx context.Context, streamURL string) (*StreamConnection, error) {
 	apiKey, _ := s.Base.APIKey()
-	
+
 	dialer := websocket.Dialer{}
-	
+
 	headers := make(map[string][]string)
 	headers["User-Agent"] = []string{"ExtendedSDKGolang/0.1.0"}
 	if apiKey != "" {
 		headers["X-Api-Key"] = []string{apiKey}
 	}
-	
+
 	conn, _, err := dialer.DialContext(ctx, streamURL, headers)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to stream: %w", err)
 	}
-	
+
 	return &StreamConnection{
-		conn:     conn,
-		closed:   false,
+		conn:      conn,
+		closed:    false,
 		msgsCount: 0,
 	}, nil
 }

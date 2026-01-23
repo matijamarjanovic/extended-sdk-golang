@@ -41,4 +41,3 @@ var STARKNET_MAINNET_CONFIG = models.EndpointConfig{
 	},
 	CollateralAssetID: "0x1",
 }
-

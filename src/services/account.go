@@ -97,7 +97,7 @@ func (s *AccountService) GetMarketFee(ctx context.Context, market string) ([]mod
 // GetFees retrieves trading fees for specified markets (matches Python SDK signature)
 func (s *AccountService) GetFees(ctx context.Context, marketNames []string, builderID *int) ([]models.TradingFeeModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/fees"
-	
+
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
@@ -105,7 +105,7 @@ func (s *AccountService) GetFees(ctx context.Context, marketNames []string, buil
 	if builderID != nil {
 		queryParts = append(queryParts, fmt.Sprintf("builderId=%d", *builderID))
 	}
-	
+
 	url := baseUrl
 	if len(queryParts) > 0 {
 		url += "?" + queryParts[0]
@@ -525,7 +525,7 @@ func (s *AccountService) AssetOperations(
 ) ([]models.AssetOperationModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/assetOperations"
 	query := make(url.Values)
-	
+
 	if id != nil {
 		query.Set("id", *id)
 	}
@@ -564,4 +564,3 @@ func (s *AccountService) AssetOperations(
 
 	return assetOperationsResponse.Data, nil
 }
-

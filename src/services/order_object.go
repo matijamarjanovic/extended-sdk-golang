@@ -11,7 +11,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-
 // createOrderObjectParams represents the parameters for creating an order object
 // All fields are required. For optional fields, pass nil or empty string.
 type createOrderObjectParams struct {
@@ -29,10 +28,10 @@ type createOrderObjectParams struct {
 	OrderExternalID          *string // optional: pass nil to use order hash as ID
 	TimeInForce              models.TimeInForce
 	SelfTradeProtectionLevel models.SelfTradeProtectionLevel
-	Nonce                    *int // optional: pass nil to auto-generate
-	BuilderFee               *decimal.Decimal // optional: pass nil if no builder fee
-	BuilderID                *int             // optional: pass nil if no builder ID
-	TpSlType                 *models.TpSlType        // optional: TPSL type (ORDER or POSITION)
+	Nonce                    *int                     // optional: pass nil to auto-generate
+	BuilderFee               *decimal.Decimal         // optional: pass nil if no builder fee
+	BuilderID                *int                     // optional: pass nil if no builder ID
+	TpSlType                 *models.TpSlType         // optional: TPSL type (ORDER or POSITION)
 	TakeProfit               *models.TpSlTriggerParam // optional: take profit trigger parameters
 	StopLoss                 *models.TpSlTriggerParam // optional: stop loss trigger parameters
 }
@@ -350,4 +349,3 @@ func HashOrder(params HashOrderParams) (string, error) {
 
 	return hash, nil
 }
-

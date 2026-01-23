@@ -83,7 +83,7 @@ func (s *MarketsService) GetCandlesHistory(
 	endTime *time.Time,
 ) ([]models.CandleModel, error) {
 	path := fmt.Sprintf("/info/candles/%s/%s", marketName, candleType)
-	
+
 	query := make(url.Values)
 	query.Set("interval", string(interval))
 	if limit != nil {
@@ -118,7 +118,7 @@ func (s *MarketsService) GetFundingRatesHistory(
 	endTime time.Time,
 ) ([]models.FundingRateModel, error) {
 	path := fmt.Sprintf("/info/%s/funding", marketName)
-	
+
 	query := make(url.Values)
 	query.Set("startTime", strconv.FormatInt(startTime.UnixMilli(), 10))
 	query.Set("endTime", strconv.FormatInt(endTime.UnixMilli(), 10))
@@ -155,4 +155,3 @@ func (s *MarketsService) GetOrderbookSnapshot(ctx context.Context, marketName st
 
 	return &orderbookResponse.Data, nil
 }
-

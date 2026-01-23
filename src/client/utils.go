@@ -24,4 +24,3 @@ func isHexString(s string) error {
 	}
 	return nil
 }
-

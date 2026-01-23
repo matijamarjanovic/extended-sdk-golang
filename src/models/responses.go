@@ -38,4 +38,3 @@ type OrderbookResponse = APIResponse[OrderbookUpdateModel]
 type EmptyResponse struct {
 	Status string `json:"status"`
 }
-

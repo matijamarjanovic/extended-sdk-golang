@@ -6,15 +6,15 @@ import "github.com/shopspring/decimal"
 type StreamDataType string
 
 const (
-	StreamDataTypeUnknown   StreamDataType = "UNKNOWN"
-	StreamDataTypeBalance   StreamDataType = "BALANCE"
-	StreamDataTypeDelta     StreamDataType = "DELTA"
-	StreamDataTypeDeposit   StreamDataType = "DEPOSIT"
-	StreamDataTypeOrder     StreamDataType = "ORDER"
-	StreamDataTypePosition  StreamDataType = "POSITION"
-	StreamDataTypeSnapshot  StreamDataType = "SNAPSHOT"
-	StreamDataTypeTrade     StreamDataType = "TRADE"
-	StreamDataTypeTransfer  StreamDataType = "TRANSFER"
+	StreamDataTypeUnknown    StreamDataType = "UNKNOWN"
+	StreamDataTypeBalance    StreamDataType = "BALANCE"
+	StreamDataTypeDelta      StreamDataType = "DELTA"
+	StreamDataTypeDeposit    StreamDataType = "DEPOSIT"
+	StreamDataTypeOrder      StreamDataType = "ORDER"
+	StreamDataTypePosition   StreamDataType = "POSITION"
+	StreamDataTypeSnapshot   StreamDataType = "SNAPSHOT"
+	StreamDataTypeTrade      StreamDataType = "TRADE"
+	StreamDataTypeTransfer   StreamDataType = "TRANSFER"
 	StreamDataTypeWithdrawal StreamDataType = "WITHDRAWAL"
 )
 
@@ -41,10 +41,10 @@ type StreamPublicTradeModel struct {
 
 // AccountStreamDataModel represents account update data from the stream
 type AccountStreamDataModel struct {
-	Orders    []OpenOrderModel `json:"orders,omitempty"`
-	Positions []PositionModel  `json:"positions,omitempty"`
+	Orders    []OpenOrderModel    `json:"orders,omitempty"`
+	Positions []PositionModel     `json:"positions,omitempty"`
 	Trades    []AccountTradeModel `json:"trades,omitempty"`
-	Balance   *BalanceModel    `json:"balance,omitempty"`
+	Balance   *BalanceModel       `json:"balance,omitempty"`
 }
 
 // MarkPriceModel represents a mark price update from the stream

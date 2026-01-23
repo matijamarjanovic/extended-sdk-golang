@@ -42,15 +42,15 @@ func TestStreamingService_buildStreamURL(t *testing.T) {
 			expected: "wss://api.starknet.sepolia.extended.exchange/stream.extended.exchange/v1/orderbooks/BTC-USD",
 		},
 		{
-			name:  "path with query params",
-			path:  "/orderbooks",
-			query: map[string]string{"depth": "10"},
+			name:     "path with query params",
+			path:     "/orderbooks",
+			query:    map[string]string{"depth": "10"},
 			expected: "wss://api.starknet.sepolia.extended.exchange/stream.extended.exchange/v1/orderbooks?depth=10",
 		},
 		{
-			name:  "candles with interval",
-			path:  "/candles/BTC-USD/trades",
-			query: map[string]string{"interval": "PT1M"},
+			name:     "candles with interval",
+			path:     "/candles/BTC-USD/trades",
+			query:    map[string]string{"interval": "PT1M"},
 			expected: "wss://api.starknet.sepolia.extended.exchange/stream.extended.exchange/v1/candles/BTC-USD/trades?interval=PT1M",
 		},
 	}

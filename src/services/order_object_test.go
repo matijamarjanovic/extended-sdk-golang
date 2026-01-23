@@ -636,4 +636,3 @@ func (suite *OrdersTestSuite) TestTPSLFailsIfHashingFails() {
 func TestOrdersTestSuite(t *testing.T) {
 	suite.Run(t, new(OrdersTestSuite))
 }
-

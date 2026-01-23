@@ -55,7 +55,7 @@ func TestStarkPerpetualAccountSign(t *testing.T) {
 
 	// verify signature has expected format (should be hex string with r, s, v components)
 	if r == nil || s == nil {
-		t.Errorf("signature components are nil")	
+		t.Errorf("signature components are nil")
 	}
 
 	assert.Equal(t, r.String(), "2744225103614379349530169149569415648483556705538760809691766060588698917266", "r does not match")
