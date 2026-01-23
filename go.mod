@@ -1,6 +1,6 @@
 module github.com/extended-protocol/extended-sdk-golang
 
-go 1.24.0
+go 1.19
 
 require (
 	github.com/joho/godotenv v1.5.1

@@ -29,7 +29,3 @@ go.work.sum
 # .vscode/
 
 python_sdk/
-
-# Refactoring plan (internal documentation)
-REFACTORING_PLAN.md
-FEATURE_COMPARISON.md
