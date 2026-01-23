@@ -28,8 +28,8 @@ func ordersExample(client *x10.Client) {
 		models.OrderTypeLimit,
 		models.TimeInForceGTT,
 		models.SelfTradeProtectionDisabled,
-		sdk.WithExpireTime(expireTime),
-		sdk.WithPostOnly(false),
+		x10.WithExpireTime(expireTime),
+		x10.WithPostOnly(false),
 	)
 
 	// place order with additional options
@@ -44,11 +44,11 @@ func ordersExample(client *x10.Client) {
 		models.OrderTypeLimit,
 		models.TimeInForceGTT,
 		models.SelfTradeProtectionDisabled,
-		sdk.WithPostOnly(true),
-		sdk.WithReduceOnly(false),
-		sdk.WithNonce(nonce),
-		sdk.WithOrderExternalID("custom-id"),
-		sdk.WithBuilderFee(builderFee),
+		x10.WithPostOnly(true),
+		x10.WithReduceOnly(false),
+		x10.WithNonce(nonce),
+		x10.WithOrderExternalID("custom-id"),
+		x10.WithBuilderFee(builderFee),
 	)
 
 	fmt.Printf("%+v\n%+v\n", order, orderWithOptions)
