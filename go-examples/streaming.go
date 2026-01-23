@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/matijamarjanovic/extended-sdk-golang/x10"
-	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
+	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 //TODO: MAKE ALIASES FOR MODELS

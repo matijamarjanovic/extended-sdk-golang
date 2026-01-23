@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	sdk "github.com/matijamarjanovic/extended-sdk-golang/x10"
+	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
 	"github.com/shopspring/decimal"
 )
 

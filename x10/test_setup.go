@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
-	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/client"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 func init() { load() }

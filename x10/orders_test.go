@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

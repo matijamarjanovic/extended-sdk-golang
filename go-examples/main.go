@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	sdk "github.com/matijamarjanovic/extended-sdk-golang/x10"
+	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
 )
 
 func main() {
