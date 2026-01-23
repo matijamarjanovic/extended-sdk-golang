@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/extended-protocol/extended-sdk-golang/x10"
 	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 //TODO: MAKE ALIASES FOR MODELS
 
-func streamingExample(client *sdk.Client) {
+func streamingExample(client *x10.Client) {
 	ctx := context.Background()
 
 	// subscribe to various websocket streams

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/extended-protocol/extended-sdk-golang/x10"
 	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
-func marketsExample(client *sdk.Client) {
+func marketsExample(client *x10.Client) {
 	ctx := context.Background()
 
 	// get market data

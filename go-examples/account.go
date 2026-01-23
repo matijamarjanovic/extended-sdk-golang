@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/extended-protocol/extended-sdk-golang/x10"
 	"github.com/shopspring/decimal"
 )
 
-func accountExample(client *sdk.Client) {
+func accountExample(client *x10.Client) {
 	ctx := context.Background()
 
 	// retrieve account information

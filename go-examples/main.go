@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	sdk "github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/extended-protocol/extended-sdk-golang/x10"
 )
 
 func main() {
@@ -20,11 +20,11 @@ func main() {
 	apiKey := os.Getenv("TESTNET_API_KEY")
 
 	// create starknet account
-	account := sdk.NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
+	account := x10.NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
 
 	// create client with testnet configuration
-	cfg := sdk.STARKNET_TESTNET_CONFIG
-	client := sdk.NewClient(cfg, account, 30*time.Second)
+	cfg := x10.STARKNET_TESTNET_CONFIG
+	client := x10.NewClient(cfg, account, 30*time.Second)
 	defer client.Close()
 
 	if len(os.Args) < 2 {
