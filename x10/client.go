@@ -3,9 +3,9 @@ package sdk
 import (
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/client"
-	"github.com/extended-protocol/extended-sdk-golang/src/models"
-	"github.com/extended-protocol/extended-sdk-golang/src/services"
+	"github.com/extended-protocol/extended-sdk-golang/x10/client"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/services"
 )
 
 // Client provides REST API functionality for perpetual trading.
@@ -23,10 +23,11 @@ type Client struct {
 // It takes an endpoint configuration, a Stark perpetual account, and a client timeout.
 func NewClient(
 	cfg models.EndpointConfig,
-	starkAccount *client.StarkPerpetualAccount,
+	starkAccount *StarkPerpetualAccount,
 	clientTimeout time.Duration,
 ) *Client {
-	baseClient := client.NewBaseClient(cfg, starkAccount.APIKey(), starkAccount, nil, clientTimeout)
+	acc := (*client.StarkPerpetualAccount)(starkAccount)
+	baseClient := client.NewBaseClient(cfg, acc.APIKey(), acc, nil, clientTimeout)
 	sdkClient := &Client{
 		BaseClient: baseClient,
 	}

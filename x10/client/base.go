@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 var (

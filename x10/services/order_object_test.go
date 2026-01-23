@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/client"
-	"github.com/extended-protocol/extended-sdk-golang/src/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/client"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/suite"
 )

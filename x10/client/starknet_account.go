@@ -6,7 +6,7 @@ import (
 	"math/big"
 	"sync"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 // StarkPerpetualAccount represents a Stark perpetual trading account.

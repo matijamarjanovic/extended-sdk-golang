@@ -3,8 +3,8 @@ package sdk
 import (
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/src/models"
-	"github.com/extended-protocol/extended-sdk-golang/src/services"
+	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/extended-protocol/extended-sdk-golang/x10/services"
 	"github.com/shopspring/decimal"
 )
 
