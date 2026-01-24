@@ -5,11 +5,11 @@ import "github.com/shopspring/decimal"
 type OrderType string
 
 const (
-	OrderTypeAll       OrderType = ""
-	OrderTypeLimit     OrderType = "LIMIT"
-	OrderTypeMarket    OrderType = "MARKET"
+	OrderTypeAll         OrderType = ""
+	OrderTypeLimit       OrderType = "LIMIT"
+	OrderTypeMarket      OrderType = "MARKET"
 	OrderTypeConditional OrderType = "CONDITIONAL"
-	OrderTypeTpsl      OrderType = "TPSL"
+	OrderTypeTpsl        OrderType = "TPSL"
 )
 
 type OrderSide string

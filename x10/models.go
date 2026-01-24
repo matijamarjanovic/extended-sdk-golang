@@ -41,11 +41,11 @@ const (
 )
 
 const (
-	OrderTypeAll       = models.OrderTypeAll
-	OrderTypeLimit     = models.OrderTypeLimit
+	OrderTypeAll         = models.OrderTypeAll
+	OrderTypeLimit       = models.OrderTypeLimit
 	OrderTypeMarket      = models.OrderTypeMarket
 	OrderTypeConditional = models.OrderTypeConditional
-	OrderTypeTpsl   = models.OrderTypeTpsl
+	OrderTypeTpsl        = models.OrderTypeTpsl
 )
 
 const (
@@ -67,8 +67,8 @@ const (
 )
 
 const (
-	TradeTypeAll       = models.TradeTypeAll
-	TradeTypeTrade     = models.TradeTypeTrade
+	TradeTypeAll         = models.TradeTypeAll
+	TradeTypeTrade       = models.TradeTypeTrade
 	TradeTypeLiquidation = models.TradeTypeLiquidation
 	TradeTypeDeleverage  = models.TradeTypeDeleverage
 )

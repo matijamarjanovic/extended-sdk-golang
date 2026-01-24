@@ -108,8 +108,8 @@ type AccountLeverage struct {
 type TradeType string
 
 const (
-	TradeTypeAll       TradeType = ""
-	TradeTypeTrade     TradeType = "TRADE"
+	TradeTypeAll         TradeType = ""
+	TradeTypeTrade       TradeType = "TRADE"
 	TradeTypeLiquidation TradeType = "LIQUIDATION"
 	TradeTypeDeleverage  TradeType = "DELEVERAGE"
 )
