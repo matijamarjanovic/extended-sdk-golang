@@ -26,7 +26,6 @@ type TriggerPriceType = models.TriggerPriceType
 type ExecutionPriceType = models.ExecutionPriceType
 type TriggerDirection = models.TriggerDirection
 
-// Streaming model aliases
 type OrderbookUpdateModel = models.OrderbookUpdateModel
 type StreamPublicTradeModel = models.StreamPublicTradeModel
 type FundingRateModel = models.FundingRateModel
