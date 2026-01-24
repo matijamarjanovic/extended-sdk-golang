@@ -13,17 +13,20 @@ func main() {
 	godotenv.Load()
 
 	// read account credentials from environment
-	vaultStr := os.Getenv("TESTNET_VAULT_ID")
+	vaultStr := os.Getenv("MAINNET_VAULT_ID")
 	vault, _ := strconv.ParseUint(vaultStr, 10, 64)
-	privateKey := os.Getenv("TESTNET_PRIVATE_KEY")
-	publicKey := os.Getenv("TESTNET_PUBLIC_KEY")
-	apiKey := os.Getenv("TESTNET_API_KEY")
+	privateKey := os.Getenv("MAINNET_PRIVATE_KEY")
+	publicKey := os.Getenv("MAINNET_PUBLIC_KEY")
+	apiKey := os.Getenv("MAINNET_API_KEY")
 
 	// create starknet account
-	account := x10.NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
+	account, err := x10.NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
+	if err != nil {
+		panic(err)
+	}
 
-	// create client with testnet configuration
-	cfg := x10.STARKNET_TESTNET_CONFIG
+	// create client with mainnet configuration
+	cfg := x10.STARKNET_MAINNET_CONFIG
 	client := x10.NewClient(cfg, account, 30*time.Second)
 	defer client.Close()
 

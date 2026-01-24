@@ -17,6 +17,7 @@ type BalanceModel struct {
 type PositionSide string
 
 const (
+	PositionSideAll   PositionSide = ""
 	PositionSideLong  PositionSide = "LONG"
 	PositionSideShort PositionSide = "SHORT"
 )
@@ -107,7 +108,8 @@ type AccountLeverage struct {
 type TradeType string
 
 const (
-	TradeTypeTrade       TradeType = "TRADE"
+	TradeTypeAll       TradeType = ""
+	TradeTypeTrade     TradeType = "TRADE"
 	TradeTypeLiquidation TradeType = "LIQUIDATION"
 	TradeTypeDeleverage  TradeType = "DELEVERAGE"
 )

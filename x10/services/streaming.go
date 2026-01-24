@@ -80,16 +80,16 @@ func (sc *StreamConnection) Recv(ctx context.Context, result interface{}) error 
 
 // SubscribeToOrderbooks subscribes to orderbook updates.
 // If marketName is empty, subscribes to all markets.
-// If depth is nil, uses default depth.
-func (s *StreamingService) SubscribeToOrderbooks(ctx context.Context, marketName string, depth *int) (*StreamConnection, error) {
+// If depth is 0, uses default depth.
+func (s *StreamingService) SubscribeToOrderbooks(ctx context.Context, marketName string, depth int) (*StreamConnection, error) {
 	path := "/orderbooks"
 	if marketName != "" {
 		path = "/orderbooks/" + marketName
 	}
 
 	query := make(map[string]string)
-	if depth != nil {
-		query["depth"] = strconv.Itoa(*depth)
+	if depth != 0 {
+		query["depth"] = strconv.Itoa(depth)
 	}
 
 	streamURL, err := s.buildStreamURL(path, query)

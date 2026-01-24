@@ -57,14 +57,13 @@ func TestMarketsService_GetCandlesHistory(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	limit := 50
 	candles, err := client.Markets.GetCandlesHistory(
 		ctx,
 		"BTC-USD",
 		models.CandleTypeTrades,
 		models.CandleIntervalPT1H,
-		&limit,
-		nil,
+		50,
+		time.Time{},
 	)
 
 	require.NoError(t, err, "should not error when getting candles history")
@@ -90,8 +89,8 @@ func TestMarketsService_GetCandlesHistory_WithLimit(t *testing.T) {
 		"BTC-USD",
 		models.CandleTypeTrades,
 		models.CandleIntervalPT5M,
-		&limit,
-		nil,
+		limit,
+		time.Time{},
 	)
 
 	require.NoError(t, err, "should not error when getting candles history with limit")
@@ -105,14 +104,13 @@ func TestMarketsService_GetCandlesHistory_WithEndTime(t *testing.T) {
 	ctx := context.Background()
 
 	endTime := time.Now()
-	limit := 5
 	candles, err := client.Markets.GetCandlesHistory(
 		ctx,
 		"BTC-USD",
 		models.CandleTypeMarkPrices,
 		models.CandleIntervalPT15M,
-		&limit,
-		&endTime,
+		5,
+		endTime,
 	)
 
 	require.NoError(t, err, "should not error when getting candles history with end time")
@@ -139,14 +137,13 @@ func TestMarketsService_GetCandlesHistory_DifferentTypes(t *testing.T) {
 	}
 
 	for _, candleType := range candleTypes {
-		limit := 50
 		candles, err := client.Markets.GetCandlesHistory(
 			ctx,
 			"BTC-USD",
 			candleType,
 			models.CandleIntervalPT1H,
-			&limit,
-			nil,
+			50,
+			time.Time{},
 		)
 
 		require.NoError(t, err, "should not error when getting candles for type %s", candleType)

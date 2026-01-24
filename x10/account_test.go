@@ -50,7 +50,7 @@ func TestAccountService_GetFees(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	fees, err := client.Account.GetFees(ctx, []string{"BTC-USD", "ETH-USD"}, nil)
+	fees, err := client.Account.GetFees(ctx, []string{"BTC-USD", "ETH-USD"}, 0)
 
 	require.NoError(t, err, "should not error when getting fees")
 	require.Greater(t, len(fees), 0, "should return at least one fee")
@@ -62,7 +62,7 @@ func TestAccountService_GetFees_WithBuilderID(t *testing.T) {
 	ctx := context.Background()
 
 	builderID := 1
-	fees, err := client.Account.GetFees(ctx, []string{"BTC-USD"}, &builderID)
+	fees, err := client.Account.GetFees(ctx, []string{"BTC-USD"}, builderID)
 
 	require.NoError(t, err, "should not error when getting fees with builder ID")
 	require.Greater(t, len(fees), 0, "should return at least one fee")
@@ -73,7 +73,7 @@ func TestAccountService_GetPositions(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	positions, err := client.Account.GetPositions(ctx, []string{}, nil)
+	positions, err := client.Account.GetPositions(ctx, []string{}, models.PositionSideAll)
 
 	require.NoError(t, err, "should not error when getting positions")
 	require.NotNil(t, positions, "positions should not be nil")
@@ -84,7 +84,7 @@ func TestAccountService_GetPositions_WithMarketFilter(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	positions, err := client.Account.GetPositions(ctx, []string{"BTC-USD"}, nil)
+	positions, err := client.Account.GetPositions(ctx, []string{"BTC-USD"}, models.PositionSideAll)
 
 	require.NoError(t, err, "should not error when getting positions with market filter")
 	require.NotNil(t, positions, "positions should not be nil")
@@ -95,8 +95,7 @@ func TestAccountService_GetPositions_WithSideFilter(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	side := models.PositionSideLong
-	positions, err := client.Account.GetPositions(ctx, []string{}, &side)
+	positions, err := client.Account.GetPositions(ctx, []string{}, models.PositionSideLong)
 
 	require.NoError(t, err, "should not error when getting positions with side filter")
 	require.NotNil(t, positions, "positions should not be nil")
@@ -107,7 +106,7 @@ func TestAccountService_GetPositionsHistory(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	history, err := client.Account.GetPositionsHistory(ctx, []string{}, nil, nil, nil)
+	history, err := client.Account.GetPositionsHistory(ctx, []string{}, models.PositionSideAll, 0, 0)
 
 	require.NoError(t, err, "should not error when getting positions history")
 	require.NotNil(t, history, "history should not be nil")
@@ -118,9 +117,8 @@ func TestAccountService_GetPositionsHistory_WithFilters(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	side := models.PositionSideLong
 	limit := 10
-	history, err := client.Account.GetPositionsHistory(ctx, []string{"BTC-USD"}, &side, nil, &limit)
+	history, err := client.Account.GetPositionsHistory(ctx, []string{"BTC-USD"}, models.PositionSideLong, 0, limit)
 
 	require.NoError(t, err, "should not error when getting positions history with filters")
 	require.NotNil(t, history, "history should not be nil")
@@ -132,7 +130,7 @@ func TestAccountService_GetOpenOrders(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	orders, err := client.Account.GetOpenOrders(ctx, []string{}, nil, nil)
+	orders, err := client.Account.GetOpenOrders(ctx, []string{}, models.OrderTypeAll, models.OrderSideAll)
 
 	require.NoError(t, err, "should not error when getting open orders")
 	require.NotNil(t, orders, "orders should not be nil")
@@ -143,9 +141,7 @@ func TestAccountService_GetOpenOrders_WithFilters(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	orderType := models.OrderTypeLimit
-	orderSide := models.OrderSideBuy
-	orders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, &orderType, &orderSide)
+	orders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, models.OrderTypeLimit, models.OrderSideBuy)
 
 	require.NoError(t, err, "should not error when getting open orders with filters")
 	require.NotNil(t, orders, "orders should not be nil")
@@ -156,7 +152,7 @@ func TestAccountService_GetOrdersHistory(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	history, err := client.Account.GetOrdersHistory(ctx, []string{}, nil, nil, nil, nil)
+	history, err := client.Account.GetOrdersHistory(ctx, []string{}, models.OrderTypeAll, models.OrderSideAll, 0, 0)
 
 	require.NoError(t, err, "should not error when getting orders history")
 	require.NotNil(t, history, "history should not be nil")
@@ -167,9 +163,8 @@ func TestAccountService_GetOrdersHistory_WithFilters(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	orderType := models.OrderTypeLimit
 	limit := 10
-	history, err := client.Account.GetOrdersHistory(ctx, []string{"BTC-USD"}, &orderType, nil, nil, &limit)
+	history, err := client.Account.GetOrdersHistory(ctx, []string{"BTC-USD"}, models.OrderTypeLimit, models.OrderSideAll, 0, limit)
 
 	require.NoError(t, err, "should not error when getting orders history with filters")
 	require.NotNil(t, history, "history should not be nil")
@@ -181,7 +176,7 @@ func TestAccountService_GetOrderByID(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	orders, err := client.Account.GetOpenOrders(ctx, []string{}, nil, nil)
+	orders, err := client.Account.GetOpenOrders(ctx, []string{}, models.OrderTypeAll, models.OrderSideAll)
 	if err != nil || len(orders) == 0 {
 		t.Skip("No open orders available for testing GetOrderByID")
 		return
@@ -200,7 +195,7 @@ func TestAccountService_GetOrderByExternalID(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	orders, err := client.Account.GetOpenOrders(ctx, []string{}, nil, nil)
+	orders, err := client.Account.GetOpenOrders(ctx, []string{}, models.OrderTypeAll, models.OrderSideAll)
 	if err != nil || len(orders) == 0 {
 		t.Skip("No open orders available for testing GetOrderByExternalID")
 		return
@@ -218,7 +213,7 @@ func TestAccountService_GetTrades(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, nil, nil, nil, nil)
+	trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, models.OrderSideAll, models.TradeTypeAll, 0, 0)
 
 	require.NoError(t, err, "should not error when getting trades")
 	require.NotNil(t, trades, "trades should not be nil")
@@ -229,10 +224,8 @@ func TestAccountService_GetTrades_WithFilters(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	tradeSide := models.OrderSideBuy
-	tradeType := models.TradeTypeTrade
 	limit := 10
-	trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD", "ETH-USD"}, &tradeSide, &tradeType, nil, &limit)
+	trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD", "ETH-USD"}, models.OrderSideBuy, models.TradeTypeTrade, 0, limit)
 
 	require.NoError(t, err, "should not error when getting trades with filters")
 	require.NotNil(t, trades, "trades should not be nil")
@@ -382,7 +375,7 @@ func TestAccountService_AssetOperations(t *testing.T) {
 	client := createTestClient()
 	ctx := context.Background()
 
-	operations, err := client.Account.AssetOperations(ctx, nil, nil, nil, nil, nil, nil, nil)
+	operations, err := client.Account.AssetOperations(ctx, "", nil, nil, 0, 0, 0, 0)
 
 	require.NoError(t, err, "should not error when getting asset operations")
 	require.NotNil(t, operations, "operations should not be nil")
@@ -397,7 +390,7 @@ func TestAccountService_AssetOperations_WithFilters(t *testing.T) {
 	operationStatuses := []models.AssetOperationStatus{models.AssetOperationStatusCompleted}
 	limit := 10
 
-	operations, err := client.Account.AssetOperations(ctx, nil, operationTypes, operationStatuses, nil, nil, nil, &limit)
+	operations, err := client.Account.AssetOperations(ctx, "", operationTypes, operationStatuses, 0, 0, 0, limit)
 
 	require.NoError(t, err, "should not error when getting asset operations with filters")
 	require.NotNil(t, operations, "operations should not be nil")

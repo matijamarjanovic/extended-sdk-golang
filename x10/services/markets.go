@@ -79,17 +79,17 @@ func (s *MarketsService) GetCandlesHistory(
 	marketName string,
 	candleType models.CandleType,
 	interval models.CandleInterval,
-	limit *int,
-	endTime *time.Time,
+	limit int,
+	endTime time.Time,
 ) ([]models.CandleModel, error) {
 	path := fmt.Sprintf("/info/candles/%s/%s", marketName, candleType)
 
 	query := make(url.Values)
 	query.Set("interval", string(interval))
-	if limit != nil {
-		query.Set("limit", strconv.Itoa(*limit))
+	if limit != 0 {
+		query.Set("limit", strconv.Itoa(limit))
 	}
-	if endTime != nil {
+	if !endTime.IsZero() {
 		query.Set("endTime", strconv.FormatInt(endTime.UnixMilli(), 10))
 	}
 

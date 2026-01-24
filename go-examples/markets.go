@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/extended-protocol/extended-sdk-golang/x10"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 func marketsExample(client *x10.Client) {
@@ -19,14 +18,13 @@ func marketsExample(client *x10.Client) {
 	orderbook, _ := client.Markets.GetOrderbookSnapshot(ctx, "BTC-USD")
 
 	// get candle history
-	limit := 100
 	candles, _ := client.Markets.GetCandlesHistory(
 		ctx,
 		"BTC-USD",
-		models.CandleTypeTrades,
-		models.CandleIntervalPT1M,
-		&limit,
-		nil,
+		x10.CandleTypeTrades,
+		x10.CandleIntervalPT1M,
+		5,
+		time.Time{},
 	)
 
 	// get funding rates history

@@ -46,7 +46,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 
 		time.Sleep(1 * time.Second)
 
-		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, nil, nil)
+		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, models.OrderTypeAll, models.OrderSideAll)
 		if err == nil && len(openOrders) > 0 {
 			t.Logf("found %d remaining open orders after cleanup, canceling them all", len(openOrders))
 
@@ -374,7 +374,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		time.Sleep(5 * time.Second)
 
 		// verify order was filled by checking trades
-		trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, nil, nil, nil, nil)
+		trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, models.OrderSideAll, models.TradeTypeAll, 0, 0)
 		require.NoError(t, err, "should be able to get trades")
 
 		var foundTrade *models.AccountTradeModel
@@ -391,7 +391,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 
 	// test 10: place reduce-only order (requires open position)
 	t.Run("PlaceReduceOnlyOrder", func(t *testing.T) {
-		positions, err := client.Account.GetPositions(ctx, []string{"BTC-USD"}, nil)
+		positions, err := client.Account.GetPositions(ctx, []string{"BTC-USD"}, models.PositionSideAll)
 		if err != nil {
 			t.Skipf("cannot test reduce-only: could not check positions: %v", err)
 			return
@@ -468,7 +468,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 
 		time.Sleep(5 * time.Second)
 
-		trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, nil, nil, nil, nil)
+		trades, err := client.Account.GetTrades(ctx, []string{"BTC-USD"}, models.OrderSideAll, models.TradeTypeAll, 0, 0)
 		require.NoError(t, err, "should be able to get trades")
 
 		var foundTrade *models.AccountTradeModel
@@ -482,7 +482,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		require.NotNil(t, foundTrade, "should find trade for placed order")
 		require.Equal(t, int(response.Data.OrderID), foundTrade.OrderID, "trade order ID should match")
 
-		positionsAfter, posErr := client.Account.GetPositions(ctx, []string{"BTC-USD"}, nil)
+		positionsAfter, posErr := client.Account.GetPositions(ctx, []string{"BTC-USD"}, models.PositionSideAll)
 		require.NoError(t, posErr, "should be able to check positions after reduce-only order")
 
 		if len(positionsAfter) > 0 {
@@ -508,7 +508,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		require.NoError(t, err, "should not error when canceling order by internal ID")
 
 		time.Sleep(500 * time.Millisecond)
-		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, nil, nil)
+		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, models.OrderTypeAll, models.OrderSideAll)
 		if err == nil {
 			for _, openOrder := range openOrders {
 				if openOrder.ExternalID == orderToCancel.externalID {
@@ -534,7 +534,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		require.NoError(t, err, "should not error when canceling order by external ID")
 
 		time.Sleep(500 * time.Millisecond)
-		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, nil, nil)
+		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, models.OrderTypeAll, models.OrderSideAll)
 		if err == nil {
 			for _, openOrder := range openOrders {
 				if openOrder.ExternalID == orderToCancel.externalID {
@@ -615,7 +615,7 @@ func TestOrderPlacementAndCancellation(t *testing.T) {
 		require.NoError(t, err, "should not error when mass canceling orders")
 
 		time.Sleep(500 * time.Millisecond)
-		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, nil, nil)
+		openOrders, err := client.Account.GetOpenOrders(ctx, []string{"BTC-USD"}, models.OrderTypeAll, models.OrderSideAll)
 		if err == nil {
 			for _, externalID := range externalIDs {
 				for _, openOrder := range openOrders {

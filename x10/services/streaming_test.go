@@ -79,7 +79,7 @@ func TestStreamingService_SubscribeToOrderbooks_RealConnection(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	conn, err := service.SubscribeToOrderbooks(ctx, "BTC-USD", nil)
+	conn, err := service.SubscribeToOrderbooks(ctx, "BTC-USD", 0)
 	require.NoError(t, err, "should successfully connect to orderbook stream")
 	defer conn.Close()
 

@@ -16,8 +16,7 @@ func streamingExample(client *x10.Client) {
 	ctx := context.Background()
 
 	// subscribe to various websocket streams
-	depth := 10
-	orderbookStream, _ := client.Streaming.SubscribeToOrderbooks(ctx, "BTC-USD", &depth)
+	orderbookStream, _ := client.Streaming.SubscribeToOrderbooks(ctx, "BTC-USD", 10)
 	defer orderbookStream.Close()
 
 	tradesStream, _ := client.Streaming.SubscribeToPublicTrades(ctx, "BTC-USD")
@@ -29,8 +28,8 @@ func streamingExample(client *x10.Client) {
 	candlesStream, _ := client.Streaming.SubscribeToCandles(
 		ctx,
 		"BTC-USD",
-		models.CandleTypeTrades,
-		models.CandleIntervalPT1M,
+		x10.CandleTypeTrades,
+		x10.CandleIntervalPT1M,
 	)
 	defer candlesStream.Close()
 

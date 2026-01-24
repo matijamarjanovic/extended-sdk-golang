@@ -8,7 +8,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/extended-protocol/extended-sdk-golang/x10/client"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 )
 
 func init() { load() }
@@ -36,33 +35,13 @@ func createTestClient() *Client {
 	publicKey := os.Getenv("TEST_PUBLIC_KEY")
 	privateKey := os.Getenv("TEST_PRIVATE_KEY")
 
-	account := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
+	account, err := NewStarkPerpetualAccount(vault, privateKey, publicKey, apiKey)
+	if err != nil {
+		panic(err)
+	}
 
 	return NewClient(STARKNET_MAINNET_CONFIG, account, 30*time.Second)
 }
 
-// Type aliases for commonly used model types in tests
-// These allow using shorter names in test files without the models.
-
-type MarketModel = models.MarketModel
-type L2ConfigModel = models.L2ConfigModel
-type StarknetDomain = models.StarknetDomain
-
-// Type aliases for client package types
-type StarkPerpetualAccount = client.StarkPerpetualAccount
-
-// Function aliases for client package functions
 var GetOrderHash = client.GetOrderHash
 var SignMessage = client.SignMessage
-
-// Constants for commonly used enum values in tests
-const (
-	OrderSideBuy  = models.OrderSideBuy
-	OrderSideSell = models.OrderSideSell
-
-	TimeInForceGTT = models.TimeInForceGTT
-
-	SelfTradeProtectionDisabled = models.SelfTradeProtectionDisabled
-	SelfTradeProtectionAccount  = models.SelfTradeProtectionAccount
-	SelfTradeProtectionClient   = models.SelfTradeProtectionClient
-)

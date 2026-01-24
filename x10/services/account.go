@@ -95,15 +95,15 @@ func (s *AccountService) GetMarketFee(ctx context.Context, market string) ([]mod
 }
 
 // GetFees retrieves trading fees for specified markets (matches Python SDK signature)
-func (s *AccountService) GetFees(ctx context.Context, marketNames []string, builderID *int) ([]models.TradingFeeModel, error) {
+func (s *AccountService) GetFees(ctx context.Context, marketNames []string, builderID int) ([]models.TradingFeeModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/fees"
 
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if builderID != nil {
-		queryParts = append(queryParts, fmt.Sprintf("builderId=%d", *builderID))
+	if builderID > 0 {
+		queryParts = append(queryParts, fmt.Sprintf("builderId=%d", builderID))
 	}
 
 	url := baseUrl
@@ -127,14 +127,14 @@ func (s *AccountService) GetFees(ctx context.Context, marketNames []string, buil
 }
 
 // GetPositions retrieves current positions, optionally filtered by market names and position side
-func (s *AccountService) GetPositions(ctx context.Context, marketNames []string, positionSide *models.PositionSide) ([]models.PositionModel, error) {
+func (s *AccountService) GetPositions(ctx context.Context, marketNames []string, positionSide models.PositionSide) ([]models.PositionModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions"
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if positionSide != nil {
-		queryParts = append(queryParts, "side="+string(*positionSide))
+	if positionSide != models.PositionSideAll {
+		queryParts = append(queryParts, "side="+string(positionSide))
 	}
 
 	url := baseUrl
@@ -158,20 +158,20 @@ func (s *AccountService) GetPositions(ctx context.Context, marketNames []string,
 }
 
 // GetPositionsHistory retrieves position history with optional filters
-func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []string, positionSide *models.PositionSide, cursor *int, limit *int) ([]models.PositionHistoryModel, error) {
+func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []string, positionSide models.PositionSide, cursor int, limit int) ([]models.PositionHistoryModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/positions/history"
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if positionSide != nil {
-		queryParts = append(queryParts, "side="+string(*positionSide))
+	if positionSide != models.PositionSideAll {
+		queryParts = append(queryParts, "side="+string(positionSide))
 	}
-	if cursor != nil {
-		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", *cursor))
+	if cursor != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", cursor))
 	}
-	if limit != nil {
-		queryParts = append(queryParts, fmt.Sprintf("limit=%d", *limit))
+	if limit != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("limit=%d", limit))
 	}
 
 	url := baseUrl
@@ -195,17 +195,17 @@ func (s *AccountService) GetPositionsHistory(ctx context.Context, marketNames []
 }
 
 // GetOpenOrders retrieves open orders with optional filters
-func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide) ([]models.OpenOrderModel, error) {
+func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string, orderType models.OrderType, orderSide models.OrderSide) ([]models.OpenOrderModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders"
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if orderType != nil {
-		queryParts = append(queryParts, "type="+string(*orderType))
+	if orderType != models.OrderTypeAll {
+		queryParts = append(queryParts, "type="+string(orderType))
 	}
-	if orderSide != nil {
-		queryParts = append(queryParts, "side="+string(*orderSide))
+	if orderSide != models.OrderSideAll {
+		queryParts = append(queryParts, "side="+string(orderSide))
 	}
 
 	url := baseUrl
@@ -229,23 +229,23 @@ func (s *AccountService) GetOpenOrders(ctx context.Context, marketNames []string
 }
 
 // GetOrdersHistory retrieves order history with optional filters
-func (s *AccountService) GetOrdersHistory(ctx context.Context, marketNames []string, orderType *models.OrderType, orderSide *models.OrderSide, cursor *int, limit *int) ([]models.OpenOrderModel, error) {
+func (s *AccountService) GetOrdersHistory(ctx context.Context, marketNames []string, orderType models.OrderType, orderSide models.OrderSide, cursor int, limit int) ([]models.OpenOrderModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/orders/history"
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if orderType != nil {
-		queryParts = append(queryParts, "type="+string(*orderType))
+	if orderType != models.OrderTypeAll {
+		queryParts = append(queryParts, "type="+string(orderType))
 	}
-	if orderSide != nil {
-		queryParts = append(queryParts, "side="+string(*orderSide))
+	if orderSide != models.OrderSideAll {
+		queryParts = append(queryParts, "side="+string(orderSide))
 	}
-	if cursor != nil {
-		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", *cursor))
+	if cursor != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", cursor))
 	}
-	if limit != nil {
-		queryParts = append(queryParts, fmt.Sprintf("limit=%d", *limit))
+	if limit != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("limit=%d", limit))
 	}
 
 	url := baseUrl
@@ -311,23 +311,23 @@ func (s *AccountService) GetOrderByExternalID(ctx context.Context, externalID st
 }
 
 // GetTrades retrieves trades with optional filters
-func (s *AccountService) GetTrades(ctx context.Context, marketNames []string, tradeSide *models.OrderSide, tradeType *models.TradeType, cursor *int, limit *int) ([]models.AccountTradeModel, error) {
+func (s *AccountService) GetTrades(ctx context.Context, marketNames []string, tradeSide models.OrderSide, tradeType models.TradeType, cursor int, limit int) ([]models.AccountTradeModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/trades"
 	queryParts := []string{}
 	for _, market := range marketNames {
 		queryParts = append(queryParts, "market="+market)
 	}
-	if tradeSide != nil {
-		queryParts = append(queryParts, "side="+string(*tradeSide))
+	if tradeSide != models.OrderSideAll {
+		queryParts = append(queryParts, "side="+string(tradeSide))
 	}
-	if tradeType != nil {
-		queryParts = append(queryParts, "type="+string(*tradeType))
+	if tradeType != models.TradeTypeAll {
+		queryParts = append(queryParts, "type="+string(tradeType))
 	}
-	if cursor != nil {
-		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", *cursor))
+	if cursor != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("cursor=%d", cursor))
 	}
-	if limit != nil {
-		queryParts = append(queryParts, fmt.Sprintf("limit=%d", *limit))
+	if limit != 0 {
+		queryParts = append(queryParts, fmt.Sprintf("limit=%d", limit))
 	}
 
 	url := baseUrl
@@ -515,19 +515,19 @@ func (s *AccountService) Transfer(
 // AssetOperations retrieves asset operations history
 func (s *AccountService) AssetOperations(
 	ctx context.Context,
-	id *string,
+	id string,
 	operationTypes []models.AssetOperationType,
 	operationStatuses []models.AssetOperationStatus,
-	startTime *int,
-	endTime *int,
-	cursor *int,
-	limit *int,
+	startTime int,
+	endTime int,
+	cursor int,
+	limit int,
 ) ([]models.AssetOperationModel, error) {
 	baseUrl := s.Base.EndpointConfig().APIBaseURL + "/user/assetOperations"
 	query := make(url.Values)
 
-	if id != nil {
-		query.Set("id", *id)
+	if id != "" {
+		query.Set("id", id)
 	}
 	for _, opType := range operationTypes {
 		query.Add("type", string(opType))
@@ -535,17 +535,17 @@ func (s *AccountService) AssetOperations(
 	for _, opStatus := range operationStatuses {
 		query.Add("status", string(opStatus))
 	}
-	if startTime != nil {
-		query.Set("startTime", strconv.Itoa(*startTime))
+	if startTime != 0 {
+		query.Set("startTime", strconv.Itoa(startTime))
 	}
-	if endTime != nil {
-		query.Set("endTime", strconv.Itoa(*endTime))
+	if endTime != 0 {
+		query.Set("endTime", strconv.Itoa(endTime))
 	}
-	if cursor != nil {
-		query.Set("cursor", strconv.Itoa(*cursor))
+	if cursor != 0 {
+		query.Set("cursor", strconv.Itoa(cursor))
 	}
-	if limit != nil {
-		query.Set("limit", strconv.Itoa(*limit))
+	if limit != 0 {
+		query.Set("limit", strconv.Itoa(limit))
 	}
 
 	url := baseUrl
