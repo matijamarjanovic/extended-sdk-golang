@@ -23,7 +23,7 @@ func marketsExample(client *x10.Client) {
 		"BTC-USD",
 		x10.CandleTypeTrades,
 		x10.CandleIntervalPT1M,
-		5,
+		1, // limit
 		time.Time{},
 	)
 

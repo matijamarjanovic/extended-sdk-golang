@@ -49,13 +49,18 @@ func ordersExample(client *x10.Client) {
 		x10.WithNonce(nonce),
 		x10.WithOrderExternalID("custom-id"),
 		x10.WithBuilderFee(builderFee),
+		x10.WithBuilderID(2017),
 	)
 
 	fmt.Printf("%+v\n%+v\n", order, orderWithOptions)
 
 	// cancel orders
-	client.Orders.CancelOrder(ctx, int(order.Data.OrderID))
-	client.Orders.CancelOrderByExternalID(ctx, orderWithOptions.Data.ExternalID)
+	if order != nil {
+		client.Orders.CancelOrder(ctx, int(order.Data.OrderID))
+	}
+	if orderWithOptions != nil {
+		client.Orders.CancelOrderByExternalID(ctx, orderWithOptions.Data.ExternalID)
+	}
 
 	// mass cancel orders
 	orderIDs := []int{1, 2, 3}

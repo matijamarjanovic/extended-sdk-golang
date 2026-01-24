@@ -26,6 +26,15 @@ type TriggerPriceType = models.TriggerPriceType
 type ExecutionPriceType = models.ExecutionPriceType
 type TriggerDirection = models.TriggerDirection
 
+// Streaming model aliases
+type OrderbookUpdateModel = models.OrderbookUpdateModel
+type StreamPublicTradeModel = models.StreamPublicTradeModel
+type FundingRateModel = models.FundingRateModel
+type CandleModel = models.CandleModel
+type AccountStreamDataModel = models.AccountStreamDataModel
+type MarkPriceModel = models.MarkPriceModel
+type IndexPriceModel = models.IndexPriceModel
+
 const (
 	PositionSideAll   = models.PositionSideAll
 	PositionSideLong  = models.PositionSideLong
