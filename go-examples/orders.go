@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/extended-protocol/extended-sdk-golang/x10"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
 	"github.com/shopspring/decimal"
 )
 
@@ -24,10 +23,10 @@ func ordersExample(client *x10.Client) {
 		market,
 		decimal.NewFromFloat(0.001),
 		decimal.NewFromFloat(50000),
-		models.OrderSideBuy,
-		models.OrderTypeLimit,
-		models.TimeInForceGTT,
-		models.SelfTradeProtectionDisabled,
+		x10.OrderSideBuy,
+		x10.OrderTypeLimit,
+		x10.TimeInForceGTT,
+		x10.SelfTradeProtectionDisabled,
 		x10.WithExpireTime(expireTime),
 		x10.WithPostOnly(false),
 	)
@@ -40,10 +39,10 @@ func ordersExample(client *x10.Client) {
 		market,
 		decimal.NewFromFloat(0.001),
 		decimal.NewFromFloat(50001),
-		models.OrderSideBuy,
-		models.OrderTypeLimit,
-		models.TimeInForceGTT,
-		models.SelfTradeProtectionDisabled,
+		x10.OrderSideBuy,
+		x10.OrderTypeLimit,
+		x10.TimeInForceGTT,
+		x10.SelfTradeProtectionDisabled,
 		x10.WithPostOnly(true),
 		x10.WithReduceOnly(false),
 		x10.WithNonce(nonce),
