@@ -3,9 +3,9 @@ package x10
 import (
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10/client"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
-	"github.com/extended-protocol/extended-sdk-golang/x10/services"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/services"
 )
 
 // Client provides REST API functionality for perpetual trading.

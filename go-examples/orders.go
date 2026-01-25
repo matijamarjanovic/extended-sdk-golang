@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10"
 	"github.com/shopspring/decimal"
 )
 

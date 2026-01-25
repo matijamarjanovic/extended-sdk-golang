@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10"
 )
 
 func streamingExample(client *x10.Client) {

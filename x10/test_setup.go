@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/extended-protocol/extended-sdk-golang/x10/client"
 	"github.com/joho/godotenv"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
 )
 
 func init() { load() }

@@ -2,8 +2,8 @@
 package x10
 
 import (
-	"github.com/extended-protocol/extended-sdk-golang/x10/client"
-	"github.com/extended-protocol/extended-sdk-golang/x10/models"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/client"
+	"github.com/matijamarjanovic/extended-sdk-golang/x10/models"
 )
 
 type MarketModel = models.MarketModel
