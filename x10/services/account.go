@@ -275,7 +275,7 @@ func (s *AccountService) GetOrderByID(ctx context.Context, orderID int) (*models
 		return nil, fmt.Errorf("failed to build URL: %w", err)
 	}
 
-	var orderResponse models.OpenOrdersResponse
+	var orderResponse models.OpenOrderResponse
 	if err := s.Base.DoRequest(ctx, "GET", baseUrl, nil, &orderResponse); err != nil {
 		return nil, err
 	}
@@ -284,11 +284,7 @@ func (s *AccountService) GetOrderByID(ctx context.Context, orderID int) (*models
 		return nil, fmt.Errorf("API returned error status: %v", orderResponse.Status)
 	}
 
-	if len(orderResponse.Data) == 0 {
-		return nil, fmt.Errorf("order not found")
-	}
-
-	return &orderResponse.Data[0], nil
+	return &orderResponse.Data, nil
 }
 
 // GetOrderByExternalID retrieves orders by external ID

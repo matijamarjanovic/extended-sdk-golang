@@ -21,6 +21,9 @@ type BalanceResponse = APIResponse[BalanceModel]
 type PositionsResponse = APIResponse[[]PositionModel]
 type PositionsHistoryResponse = APIResponse[[]PositionHistoryModel]
 type OpenOrdersResponse = APIResponse[[]OpenOrderModel]
+
+// OpenOrderResponse is the response type for GET /user/orders/{id}, which returns a single order object
+type OpenOrderResponse = APIResponse[OpenOrderModel]
 type OrdersHistoryResponse = APIResponse[[]OpenOrderModel]
 type TradesResponse = APIResponse[[]AccountTradeModel]
 type AccountResponse = APIResponse[AccountModel]
